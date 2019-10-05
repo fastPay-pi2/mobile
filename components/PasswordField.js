@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View, TextInput, StyleSheet } from 'react-native';
+import styles from '../Styles/InputFieldStyles';
 
 const changePasswordStyleAccordingToInput = (password) => {
   const passwordRegex = /^(?=.{6,})(?!.*\s).*$/g;
@@ -43,25 +44,6 @@ const PasswordField = props => (
     />
   </View>
 );
-
-const styles = StyleSheet.create({
-  InputFieldStyle: {
-    padding: 15,
-    marginTop: 0,
-    paddingLeft: 15,
-    backgroundColor: '#FAFAFA',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-  },
-  InputStyle: {
-    flex: 1,
-  },
-});
 
 PasswordField.propTypes = {
   callback: PropTypes.func.isRequired,
