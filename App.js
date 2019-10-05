@@ -21,7 +21,7 @@ export default function App(props) {
   } else {
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
         <AppNavigator />
       </View>
     );
@@ -32,6 +32,8 @@ async function loadResourcesAsync() {
   await Promise.all([
     Asset.loadAsync([
       // images to load
+      require('./assets/images/carshier_Logo_cor.png'),
+      require('./assets/images/carshier_Logo_transparente.png'),
     ]),
     Font.loadAsync({
       // This is the font that we are using for our tab bar
@@ -39,6 +41,7 @@ async function loadResourcesAsync() {
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
       'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+      'work-sans-semiBold': require('./assets/fonts/WorkSans-SemiBold.otf'),
     }),
   ]);
 }

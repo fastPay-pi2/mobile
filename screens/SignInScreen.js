@@ -9,7 +9,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   TouchableOpacity,
-  Text
+  Text,
+  Image
 } from 'react-native';
 import UsernameField from '../components/UsernameField'
 import PasswordField from '../components/PasswordField'
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 30,
-    backgroundColor: '#FAD3B0',
+    backgroundColor: '#fad3b0',
     justifyContent: 'center',
   },
   loading: {
@@ -37,11 +38,25 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     shadowOffset : { width: 0, height: 13},
   },
+  logoView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  imageLogo: {
+    width: 120,
+    height: 120
+  },
+  textLogo: {
+    fontSize: 36,
+    fontFamily: 'work-sans-semiBold',
+  },
   footer: {
     flex: 0.075,
     borderTopColor: '#a9a9a9',
-    borderTopWidth: 1,
-    backgroundColor: '#FAD3B0',
+    borderTopWidth: 0,
+    backgroundColor: '#F5D4B1',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -60,7 +75,8 @@ export default class SignInScreen extends React.Component {
   };
 
   static navigationOptions = {
-    header: null
+    header: null,
+    headerBackTitle: null
   };
 
   render() {
@@ -68,6 +84,10 @@ export default class SignInScreen extends React.Component {
     return (
       <View style={{flex:1}}>
         <KeyboardAvoidingView style={styles.content} behavior="padding">
+          <View style={styles.logoView}>
+            <Image source={require('../assets/images/carshier_Logo_transparente.png')} style={styles.imageLogo}/>
+            <Text style={styles.textLogo} >fastPay</Text>
+          </View>
           <UsernameField
             callback={usernameInput => this.setState({ username: usernameInput })}
             placeholder="username"
@@ -99,6 +119,7 @@ export default class SignInScreen extends React.Component {
         <View style={styles.footer}>
           <TouchableOpacity
             activeOpacity={0.6}
+            onPress={() => this._signInAsync()}
           >
             <Text>Ainda não se cadastrou?
               <Text style={{ color: '#0000FF' }}> Cadastrar-se</Text>
@@ -109,4 +130,9 @@ export default class SignInScreen extends React.Component {
 
     );
   }
+
+  _signInAsync = async () => {
+    // await AsyncStorage.setItem('userToken', 'abc');
+    this.props.navigation.navigate('Register');
+  };
 }
