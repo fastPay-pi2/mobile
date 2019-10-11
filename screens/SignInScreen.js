@@ -107,7 +107,7 @@ export default class SignInScreen extends React.Component {
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}
             onPress={() => {
-              this.setState({isLoading: true});
+              this._signInAsync();
             }}
             isLoading={this.state.isLoading}
             buttonKey="Login"
@@ -119,7 +119,7 @@ export default class SignInScreen extends React.Component {
         <View style={styles.footer}>
           <TouchableOpacity
             activeOpacity={0.6}
-            onPress={() => this._signInAsync()}
+            onPress={() => this.props.navigation.navigate('Register')}
           >
             <Text>Ainda não se cadastrou?
               <Text style={{ color: '#0000FF' }}> Cadastrar-se</Text>
@@ -132,7 +132,8 @@ export default class SignInScreen extends React.Component {
   }
 
   _signInAsync = async () => {
-    // await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('Register');
+    this.setState({isLoading:true})
+    await AsyncStorage.setItem('userToken', 'abc');
+    this.props.navigation.navigate('App');
   };
 }
