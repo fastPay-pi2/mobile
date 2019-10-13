@@ -80,7 +80,6 @@ export default class SignInScreen extends React.Component {
   };
 
   render() {
-    console.log(this.state.focus)
     return (
       <View style={{flex:1}}>
         <KeyboardAvoidingView style={styles.content} behavior="padding">

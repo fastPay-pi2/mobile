@@ -8,12 +8,12 @@ import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicat
 
 export default class ShoppingScreen extends React.Component {
   state = {
+    isLoading: 'false',
   };
 
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Carrinho',
-      isLoading: 'false',
     }
   };
 
@@ -35,7 +35,7 @@ export default class ShoppingScreen extends React.Component {
           <Text style={{alignItems: 'center'}}>R$100,00</Text>
 
           <ButtonWithActivityIndicator
-          activityIndicatorStyle={styles.loading}
+            activityIndicatorStyle={styles.loading}
             onPress={() => {
               this._signInAsync();
             }}
