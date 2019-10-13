@@ -12,7 +12,8 @@ import {
   Text,
   Image
 } from 'react-native';
-import UsernameField from '../components/UsernameField'
+import api from '../config/api';
+import EmailField from '../components/EmailField'
 import PasswordField from '../components/PasswordField'
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator'
 
@@ -64,14 +65,20 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     shadowOffset : { width: 0, height: 10},
   },
+  messageErrorStyle: {
+    alignSelf: 'center',
+    color: '#FC1055',
+  },
 });
 
 export default class SignInScreen extends React.Component {
   state = {
-      username: '',
+      email: '',
       password: '',
       focus: false,
-      isLoading: false
+      isLoading: false,
+      error: false,
+      messageError: '',
   };
 
   static navigationOptions = {
@@ -87,12 +94,13 @@ export default class SignInScreen extends React.Component {
             <Image source={require('../assets/images/carshier_Logo_transparente.png')} style={styles.imageLogo}/>
             <Text style={styles.textLogo} >fastPay</Text>
           </View>
-          <UsernameField
-            callback={usernameInput => this.setState({ username: usernameInput })}
-            placeholder="username"
+          <EmailField
+            callback={usernameInput => this.setState({ email: usernameInput })}
+            placeholder="email"
             onSubmitEditing={() => this.setState({ focus: true })}
-            value={this.state.username}
+            value={this.state.email}
             blurOnSubmit={false}
+            size={26}
           />
           <PasswordField
             refs={(input) =>  this.secondTextInput = input}
@@ -102,6 +110,7 @@ export default class SignInScreen extends React.Component {
             isPassword
             focus={this.state.focus}
           />
+        <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
 
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}
@@ -131,8 +140,26 @@ export default class SignInScreen extends React.Component {
   }
 
   _signInAsync = async () => {
-    this.setState({isLoading:true})
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
+    this.setState({ isLoading:true })
+    const body = {
+      'email': this.state.email,
+      'password': this.state.password,
+    }
+
+    api.post('/sessions', body)
+    .then( async res => {
+      if (res.data.token) {
+        await AsyncStorage.setItem('userToken', res.data.token);
+        this.props.navigation.navigate('App');
+      }
+    })
+    .catch(error => {
+      console.log(error.response);
+      if (error.response.data.error === 'User not found') {
+        this.setState({messageError: 'Usuário ou senha inválida'});
+        this.setState({ isLoading:false })
+      }
+    })
+
   };
 }
