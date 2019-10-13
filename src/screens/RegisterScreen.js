@@ -15,6 +15,7 @@ import {
   BackHandler,
   Dimensions,
 } from 'react-native';
+import api from '../config/api'
 import CpfField from '../components/CpfField'
 import NameField from '../components/NameField'
 import UsernameField from '../components/UsernameField'
@@ -135,9 +136,7 @@ export default class RegisterScreen extends React.Component {
 
               <ButtonWithActivityIndicator
                 activityIndicatorStyle={styles.loading}
-                onPress={() => {
-                  this.setState({isLoading: true});
-                }}
+                onPress={() => this._registerAsync()}
                 isLoading={this.state.isLoading}
                 buttonKey="Cadastrar"
                 buttonText="Cadastrar"
@@ -151,7 +150,25 @@ export default class RegisterScreen extends React.Component {
   }
 
   _registerAsync = async () => {
+    this.setState({isLoading: true});
+    const body = {
+      'name': this.state.name,
+      'username': this.state.username,
+      'email': this.state.email,
+      'cpf': this.state.profile.cpf,
+      'password': this.state.password,
+      'birphday': '',
+      'idAdmin': false,
+    }
+    console.log(body);
+    api.post('/users', body)
+    .then( res => {
+      if (res.status === '200') {
+
+      }
+      console.log(res.data);
+    })
     // await AsyncStorage.setItem('userToken', '');
-    this.props.navigation.navigate('SignIn');
+    // this.props.navigation.navigate('SignIn');
   };
 }
