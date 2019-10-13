@@ -65,6 +65,7 @@ export default class QRCodeScannerScreen extends React.Component {
   handleQRCodeScanned = ({ type, data }) => {
     this.setState({ scanned: true });
     alert(`${data}`);
+    this.props.navigation.navigate('Shopping');
   };
 
   showNoPermissionAlert() {
