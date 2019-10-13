@@ -40,8 +40,8 @@ export default class ShoppingScreen extends React.Component {
               this._signInAsync();
             }}
             isLoading={this.state.isLoading}
-            buttonKey="Login"
-            buttonText="Login"
+            buttonKey="Pagar"
+            buttonText="Pagar"
             buttonStyle={styles.buttonLogin}
           />
 

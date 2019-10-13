@@ -9,9 +9,11 @@ export default class ShoppingListScreen extends React.Component {
     lists: ['teste1', 'teste2', 'teste3'],
   };
 
-  static navigationOptions = {
-    title: 'Listas de Compras',
-    headerRight: <AntDesign style={{paddingRight: 10}} onPress={() => {/*adicionar lista*/}} name='plus' size={20} color='black' />,
+  static navigationOptions = ({navigation}) => {
+    return {
+      title: 'Listas de Compras',
+      headerRight: <AntDesign style={{paddingRight: 10}} onPress={() => {navigation.navigate('CreateShoppingList')}} name='plus' size={20} color='black' />,
+    }
   };
 
   printLists = list => {
