@@ -8,7 +8,7 @@ import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicat
 
 export default class ShoppingScreen extends React.Component {
   state = {
-    isLoading: 'false',
+    isLoading: false,
   };
 
   static navigationOptions = ({navigation}) => {
@@ -27,17 +27,14 @@ export default class ShoppingScreen extends React.Component {
           </Text>
         </View>
 
-        <ScrollView>
-
-        </ScrollView>
         <View style={styles.footer}>
 
-          <Text style={{alignItems: 'center'}}>R$100,00</Text>
+          <Text style={{alignSelf: 'center'}}>R$100,00</Text>
 
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}
             onPress={() => {
-              this._signInAsync();
+
             }}
             isLoading={this.state.isLoading}
             buttonKey="Pagar"
@@ -53,10 +50,9 @@ export default class ShoppingScreen extends React.Component {
 
 const styles = StyleSheet.create({
   buttonLogin: {
-    paddingVertical: 18,
-    marginTop: 50,
+    paddingVertical: 20,
+    paddingHorizontal: 60,
     borderRadius: 8,
-    alignItems: 'center',
     backgroundColor: '#FC1055',
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
@@ -70,18 +66,19 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   shopping: {
+    flex: 1,
     alignItems:'center',
     margin: 50,
     padding: 10,
   },
   footer: {
-    flex: 0.75,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    flex: 0.2,
     borderTopColor: '#A9A9A9',
     borderTopWidth: 0.5,
     backgroundColor: '#f2f2f2',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'row',
 
   },
   loading: {
