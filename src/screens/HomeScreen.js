@@ -17,11 +17,6 @@ export default class HomeScreen extends React.Component {
     title: 'Home',
   };
 
-  _signOutAsync = async () => {
-    await AsyncStorage.clear();
-    this.props.navigation.navigate('Auth');
-  };
-
   render() {
     return (
       <View style={styles.container}>
@@ -29,7 +24,6 @@ export default class HomeScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
           <Button title="Iniciar Compra" onPress={() => this.props.navigation.navigate('Scan')} />
-          <Button title="Sair" onPress={this._signOutAsync} />
         </ScrollView>
       </View>
     );

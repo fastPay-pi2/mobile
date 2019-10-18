@@ -42,6 +42,7 @@ async function loadResourcesAsync() {
       // remove this if you are not using it in your app
       'space-mono': require('./src/assets/fonts/SpaceMono-Regular.ttf'),
       'work-sans-semiBold': require('./src/assets/fonts/WorkSans-SemiBold.otf'),
+      'nunito': require('./src/assets/fonts/Nunito-Regular.ttf'),
     }),
   ]);
 }
