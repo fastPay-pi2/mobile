@@ -58,6 +58,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 15,
   },
+  messageErrorStyle: {
+    alignSelf: 'center',
+    color: '#FC1055',
+  },
 });
 
 export default class RegisterScreen extends React.Component {
@@ -71,6 +75,7 @@ export default class RegisterScreen extends React.Component {
       phone: '',
     },
     passwordCompared: '',
+    messageError: '',
     isLoading: false,
   };
 
@@ -133,6 +138,7 @@ export default class RegisterScreen extends React.Component {
                 isPassword={false}
                 size={26}
               />
+              <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
 
               <ButtonWithActivityIndicator
                 activityIndicatorStyle={styles.loading}
@@ -160,15 +166,21 @@ export default class RegisterScreen extends React.Component {
       'birphday': '',
       'idAdmin': false,
     }
-    console.log(body);
+
     api.post('/users', body)
     .then( res => {
       if (res.status === '200') {
-
+        this.props.navigation.navigate('SignIn');
       }
-      console.log(res.data);
+    })
+    .catch(error => {
+      console.log(error.response);
+
+      if (error.response.data.error === 'User already exists') {
+        this.setState({messageError: 'Usuário já existe'});
+        this.setState({ isLoading:false })
+      }
     })
     // await AsyncStorage.setItem('userToken', '');
-    // this.props.navigation.navigate('SignIn');
   };
 }
