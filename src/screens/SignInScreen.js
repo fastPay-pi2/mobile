@@ -150,6 +150,7 @@ export default class SignInScreen extends React.Component {
     .then( async res => {
       if (res.data.token) {
         await AsyncStorage.setItem('userToken', res.data.token);
+        await AsyncStorage.setItem('nomeUsuario', res.data.user.name);
         this.props.navigation.navigate('App');
       }
     })

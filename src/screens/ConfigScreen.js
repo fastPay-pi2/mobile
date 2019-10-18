@@ -18,10 +18,13 @@ export default class ConfigScreen extends React.Component {
   };
 
   async componentDidMount() {
-    var value = await AsyncStorage.getItem('nomeUsuario');
-    value = value.split(' ');
-    value = value[0] + ' ' + value[1]
-    this.setState({nomeUsuario: value});
+    var temp = await AsyncStorage.getItem('nomeUsuario');
+    temp = temp.split(' ');
+    nomeUsuario = temp[0]
+    if (temp[1]) {
+      nomeUsuario += ' ' + temp[1];
+    }
+    this.setState({nomeUsuario});
   }
 
   _signOutAsync = async () => {
