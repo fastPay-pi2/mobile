@@ -1,4 +1,5 @@
 import React from 'react';
+import Timeline from 'react-native-timeline-listview'
 import {
   AsyncStorage,
   Platform,
@@ -29,6 +30,13 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
+    this.data = [
+      {time: '09:00', title: 'Event 1', description: 'Event 1 Description'},
+      {time: '10:45', title: 'Event 2', description: 'Event 2 Description'},
+      {time: '12:00', title: 'Event 3', description: 'Event 3 Description'},
+      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
+      {time: '16:30', title: 'Event 5', description: 'Event 5 Description'}
+    ]
     return (
       <SafeAreaView  style={styles.container}>
         <View style={styles.buttonContainer}>
@@ -39,13 +47,17 @@ export default class HomeScreen extends React.Component {
               Iniciar Compra
             </Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.containerPurchases}>
-            <View>
-              <Text style={styles.title}>Compras</Text>
-            </View>
-          <ScrollView>
-          </ScrollView>
+          <View style={styles.containerPurchases}>
+            <Text style={styles.title}>Compras</Text>
+            <ScrollView>
+              <Timeline
+                lineColor='#a9a9a9'
+                circleColor='#a9a9a9'
+                style={styles.timeLine}
+                data={this.data}
+              />
+            </ScrollView>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -56,14 +68,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // justifyContent: "center",
-    // alignItems: "center",
     padding: 30,
-    // justifyContent: "space-between"
   },
   buttonContainer: {
     flex: 1,
-    alignItems: "center",
     padding: 10
   },
   contentContainer: {
@@ -91,12 +99,13 @@ const styles = StyleSheet.create({
   title: {
     color: "#000",
     fontWeight: "bold",
-    fontSize: 16
+    fontSize: 26
   },
   containerPurchases: {
     flex: 1,
-    // justifyContent: "left",
-    // alignItems: "center",
     padding: 30
+  },
+  timeLine: {
+    marginTop: 30
   }
 });

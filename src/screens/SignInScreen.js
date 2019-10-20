@@ -83,7 +83,7 @@ export default class SignInScreen extends React.Component {
         </View>
       </View>
 
-);
+    );
   }
   
   _signInAsync = async () => {
