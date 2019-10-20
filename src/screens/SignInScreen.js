@@ -17,6 +17,101 @@ import EmailField from '../components/EmailField'
 import PasswordField from '../components/PasswordField'
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator'
 
+
+export default class SignInScreen extends React.Component {
+  state = {
+      email: '',
+      password: '',
+      focus: false,
+      isLoading: false,
+      error: false,
+      messageError: '',
+    };
+
+    static navigationOptions = {
+      header: null,
+    headerBackTitle: null
+  };
+
+  render() {
+    return (
+      <View style={{flex:1}}>
+        <KeyboardAvoidingView style={styles.content} behavior="padding">
+          <View style={styles.logoView}>
+            <Image source={require('../assets/images/carshier_Logo_transparente.png')} style={styles.imageLogo}/>
+            <Text style={styles.textLogo} >fastPay</Text>
+          </View>
+          <EmailField
+            callback={usernameInput => this.setState({ email: usernameInput })}
+            placeholder="email"
+            onSubmitEditing={() => this.setState({ focus: true })}
+            value={this.state.email}
+            blurOnSubmit={false}
+            size={26}
+            />
+          <PasswordField
+            refs={(input) =>  this.secondTextInput = input}
+            callback={passwordInput => this.setState({ password: passwordInput })}
+            password={this.state.password}
+            placeholder="password"
+            isPassword
+            focus={this.state.focus}
+          />
+        <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
+
+          <ButtonWithActivityIndicator
+            activityIndicatorStyle={styles.loading}
+            onPress={() => {
+              this._signInAsync();
+            }}
+            isLoading={this.state.isLoading}
+            buttonKey="Login"
+            buttonText="Login"
+            buttonStyle={styles.buttonLogin}
+          />
+        </KeyboardAvoidingView>
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            onPress={() => this.props.navigation.navigate('Register')}
+          >
+            <Text>Ainda não se cadastrou?
+              <Text style={{ color: '#0000FF' }}> Cadastrar-se</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+);
+  }
+  
+  _signInAsync = async () => {
+    this.setState({ isLoading:true })
+    const body = {
+      'email': this.state.email,
+      'password': this.state.password,
+    }
+    
+    api.post('/sessions', body)
+    .then( async res => {
+      if (res.data.token) {
+        await AsyncStorage.setItem('userToken', res.data.token);
+        await AsyncStorage.setItem('nomeUsuario', res.data.user.name);
+        this.props.navigation.navigate('App');
+      }
+    })
+    .catch(error => {
+      console.log(error.response);
+      if (error.response.data.error === 'User not found') {
+        this.setState({messageError: 'Usuário ou senha inválida'});
+        this.setState({ isLoading:false })
+      }
+    })
+    
+  };
+}
+
 const styles = StyleSheet.create({
   content: {
     flex: 1,
@@ -56,7 +151,7 @@ const styles = StyleSheet.create({
   footer: {
     flex: 0.075,
     borderTopColor: '#a9a9a9',
-    borderTopWidth: 0,
+    borderTopWidth: 0.2,
     backgroundColor: '#F5D4B1',
     justifyContent: 'center',
     alignItems: 'center',
@@ -70,97 +165,3 @@ const styles = StyleSheet.create({
     color: '#FC1055',
   },
 });
-
-export default class SignInScreen extends React.Component {
-  state = {
-      email: '',
-      password: '',
-      focus: false,
-      isLoading: false,
-      error: false,
-      messageError: '',
-  };
-
-  static navigationOptions = {
-    header: null,
-    headerBackTitle: null
-  };
-
-  render() {
-    return (
-      <View style={{flex:1}}>
-        <KeyboardAvoidingView style={styles.content} behavior="padding">
-          <View style={styles.logoView}>
-            <Image source={require('../assets/images/carshier_Logo_transparente.png')} style={styles.imageLogo}/>
-            <Text style={styles.textLogo} >fastPay</Text>
-          </View>
-          <EmailField
-            callback={usernameInput => this.setState({ email: usernameInput })}
-            placeholder="email"
-            onSubmitEditing={() => this.setState({ focus: true })}
-            value={this.state.email}
-            blurOnSubmit={false}
-            size={26}
-          />
-          <PasswordField
-            refs={(input) =>  this.secondTextInput = input}
-            callback={passwordInput => this.setState({ password: passwordInput })}
-            password={this.state.password}
-            placeholder="password"
-            isPassword
-            focus={this.state.focus}
-          />
-        <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
-
-          <ButtonWithActivityIndicator
-            activityIndicatorStyle={styles.loading}
-            onPress={() => {
-              this._signInAsync();
-            }}
-            isLoading={this.state.isLoading}
-            buttonKey="Login"
-            buttonText="Login"
-            buttonStyle={styles.buttonLogin}
-          />
-        </KeyboardAvoidingView>
-
-        <View style={styles.footer}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => this.props.navigation.navigate('Register')}
-          >
-            <Text>Ainda não se cadastrou?
-              <Text style={{ color: '#0000FF' }}> Cadastrar-se</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-    );
-  }
-
-  _signInAsync = async () => {
-    this.setState({ isLoading:true })
-    const body = {
-      'email': this.state.email,
-      'password': this.state.password,
-    }
-
-    api.post('/sessions', body)
-    .then( async res => {
-      if (res.data.token) {
-        await AsyncStorage.setItem('userToken', res.data.token);
-        await AsyncStorage.setItem('nomeUsuario', res.data.user.name);
-        this.props.navigation.navigate('App');
-      }
-    })
-    .catch(error => {
-      console.log(error.response);
-      if (error.response.data.error === 'User not found') {
-        this.setState({messageError: 'Usuário ou senha inválida'});
-        this.setState({ isLoading:false })
-      }
-    })
-
-  };
-}
