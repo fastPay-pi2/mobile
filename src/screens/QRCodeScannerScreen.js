@@ -26,6 +26,11 @@ export default class QRCodeScannerScreen extends React.Component {
     return {
       title: 'Escaneie o código QR',
       headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
+      headerStyle: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 66
+      }
     };
   };
 
@@ -94,8 +99,13 @@ export default class QRCodeScannerScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
+    // flex: 1,
+    // flexDirection: 'column',
+    // justifyContent: 'flex-end',
+    // backgroundColor: '#000',
+    marginHorizontal: 0, marginLeft: 0, marginStart: 0,
+    paddingHorizontal: 0, paddingLeft: 0, paddingStart: 0,
+    height: '115%',
+    padding: 0
   },
 });
