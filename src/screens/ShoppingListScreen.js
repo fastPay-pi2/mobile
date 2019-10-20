@@ -6,7 +6,7 @@ import { HeaderBackButton } from 'react-navigation';
 
 export default class ShoppingListScreen extends React.Component {
   state = {
-    lists: ['COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA'],
+    lists: ['COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA'],
   };
 
   static navigationOptions = ({navigation}) => {
@@ -100,9 +100,10 @@ const styles = StyleSheet.create({
     marginRight: 66,
     marginLeft: 66,
     marginTop: 20,
+    marginBottom: 10,
     alignItems: "center",
-    borderWidth: 0.5,
-    borderColor: '#a9a9a9'
+    borderWidth: 1,
+    borderColor: '#EDEFF2'
   },
   buttonAddText: {
     color: "#FC1055",

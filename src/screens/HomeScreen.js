@@ -35,11 +35,14 @@ export default class HomeScreen extends React.Component {
       {time: '10:45', title: 'Event 2', description: 'Event 2 Description'},
       {time: '12:00', title: 'Event 3', description: 'Event 3 Description'},
       {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
+      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
+      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
+      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
+      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
       {time: '16:30', title: 'Event 5', description: 'Event 5 Description'}
     ]
     return (
       <SafeAreaView  style={styles.container}>
-        <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('Scan')}
             style={styles.button}>
@@ -58,7 +61,6 @@ export default class HomeScreen extends React.Component {
               />
             </ScrollView>
           </View>
-        </View>
       </SafeAreaView>
     );
   };
@@ -68,11 +70,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 30,
-  },
-  buttonContainer: {
-    flex: 1,
-    padding: 10
+    // padding: 30,
   },
   contentContainer: {
     paddingTop: 30,
@@ -87,8 +85,9 @@ const styles = StyleSheet.create({
     height: 46,
     alignSelf: "stretch",
     justifyContent: "center",
-    marginRight: 66,
-    marginLeft: 66,
+    marginRight: 96,
+    marginLeft: 96,
+    marginTop: 40,
     alignItems: "center",
   },
   buttonText: {
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
   },
   containerPurchases: {
     flex: 1,
-    padding: 30
+    padding: 20
   },
   timeLine: {
     marginTop: 30

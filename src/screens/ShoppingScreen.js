@@ -14,6 +14,15 @@ export default class ShoppingScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Carrinho',
+      headerStyle: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 66
+      },
+      headerTitleStyle: { 
+        textAlign:"center", 
+        flex:1 
+      }
     }
   };
 
@@ -33,9 +42,7 @@ export default class ShoppingScreen extends React.Component {
 
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}
-            onPress={() => {
-
-            }}
+            onPress={() => {}}
             isLoading={this.state.isLoading}
             buttonKey="Pagar"
             buttonText="Pagar"
