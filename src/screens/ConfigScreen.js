@@ -10,21 +10,30 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default class ConfigScreen extends React.Component {
   state = {
-    nomeUsuario: '',
+    userName: '',
   }
 
   static navigationOptions = {
     title: 'Perfil',
+    headerStyle: {
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      height: 66
+    },
+    headerTitleStyle: { 
+      textAlign:"center", 
+      flex:1 
+    }
   };
 
   async componentDidMount() {
-    var temp = await AsyncStorage.getItem('nomeUsuario');
+    var temp = await AsyncStorage.getItem('userName');
     temp = temp.split(' ');
-    nomeUsuario = temp[0]
+    userName = temp[0]
     if (temp[1]) {
-      nomeUsuario += ' ' + temp[1];
+      userName += ' ' + temp[1];
     }
-    this.setState({nomeUsuario});
+    this.setState({userName});
   }
 
   _signOutAsync = async () => {
@@ -36,9 +45,11 @@ export default class ConfigScreen extends React.Component {
     return (
       <View >
         <View style={styles.container}>
-          <Text style={styles.userNameStyle}>{this.state.nomeUsuario}</Text>
+          <Text style={styles.userNameStyle}>{this.state.userName}</Text>
           <TouchableOpacity style={styles.logoutButton} title='Logout' onPress={this._signOutAsync}>
-            <Text style={{color: 'white'}}>Logout</Text>
+            <Text style={styles.logoutText}>
+              Logout
+            </Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity activeOpacity={0.5} style={styles.contentContainer}>
@@ -89,11 +100,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
-    backgroundColor: '#FC1055',
-    shadowColor: 'rgba(252, 16, 85, 0.5)',
-    shadowOpacity: 0.8,
-    shadowRadius: 15,
-    shadowOffset : { width: 0, height: 13},
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#EDEFF2'
+  },
+  logoutText: {
+    color: "#FC1055",
+    fontWeight: "bold",
+    fontSize: 16
   },
   iconStyle: {
     marginRight: 20,

@@ -87,7 +87,7 @@ export default class SignInScreen extends React.Component {
   }
   
   _signInAsync = async () => {
-    this.setState({ isLoading:true })
+    this.setState({ isLoading: true })
     const body = {
       'email': this.state.email,
       'password': this.state.password,
@@ -97,7 +97,8 @@ export default class SignInScreen extends React.Component {
     .then( async res => {
       if (res.data.token) {
         await AsyncStorage.setItem('userToken', res.data.token);
-        await AsyncStorage.setItem('nomeUsuario', res.data.user.name);
+        await AsyncStorage.setItem('userName', res.data.user.name);
+        await AsyncStorage.setItem('userId', res.data.user._id);
         this.props.navigation.navigate('App');
       }
     })

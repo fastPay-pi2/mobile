@@ -54,8 +54,8 @@ export default class HomeScreen extends React.Component {
             <Text style={styles.title}>Compras</Text>
             <ScrollView>
               <Timeline
-                lineColor='#a9a9a9'
-                circleColor='#a9a9a9'
+                lineColor='#EDEFF2'
+                circleColor='#FC1055'
                 style={styles.timeLine}
                 data={this.data}
               />
@@ -69,8 +69,7 @@ export default class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    // padding: 30,
+    backgroundColor: '#fff'
   },
   contentContainer: {
     paddingTop: 30,

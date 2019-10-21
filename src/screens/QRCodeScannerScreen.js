@@ -99,10 +99,6 @@ export default class QRCodeScannerScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // flexDirection: 'column',
-    // justifyContent: 'flex-end',
-    // backgroundColor: '#000',
     marginHorizontal: 0, marginLeft: 0, marginStart: 0,
     paddingHorizontal: 0, paddingLeft: 0, paddingStart: 0,
     height: '115%',
