@@ -18,22 +18,25 @@ export default class ShoppingListScreen extends React.Component {
         borderRadius: 10,
         height: 66
       },
-      headerTitleStyle: { 
-        textAlign:"center", 
-        flex:1 
+      headerTitleStyle: {
+        textAlign:'center',
+        flex:1
       }
     }
   };
 
-  printLists = list => {
+  printLists = (list, i) => {
     return(
-      <View>
+      <View
+        key={i}
+      >
         <TouchableOpacity
-            onPress={() => {/*visualizar lista*/}}
-            style={styles.button}>
-            <Text style={styles.buttonText}>
-              {list.toUpperCase()}
-            </Text>
+          onPress={() => {/*visualizar lista*/}}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>
+            {list.toUpperCase()}
+          </Text>
         </TouchableOpacity>
       </View>
     )
@@ -69,42 +72,33 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 18,
-    borderRadius: 8,
+    marginHorizontal: 66,
+    marginTop: 20,
+    alignItems: 'center',
     backgroundColor: '#FC1055',
+    borderRadius: 8,
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    height: 46,
-    alignSelf: "stretch",
-    justifyContent: "center",
-    marginRight: 66,
-    marginLeft: 66,
-    marginTop: 20,
-    alignItems: "center",
   },
   buttonText: {
-    color: "#FFF",
-    fontWeight: "bold",
+    color: '#FFF',
+    fontWeight: 'bold',
     fontSize: 16
   },
   buttonAdd: {
     paddingVertical: 18,
-    borderRadius: 8,
+    marginHorizontal: 66,
+    marginVertical: 20,
+    alignItems: 'center',
     backgroundColor: '#FFF',
-    height: 46,
-    alignSelf: "stretch",
-    justifyContent: "center",
-    marginRight: 66,
-    marginLeft: 66,
-    marginTop: 20,
-    marginBottom: 10,
-    alignItems: "center",
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#EDEFF2'
   },
   buttonAddText: {
-    color: "#FC1055",
-    fontWeight: "bold",
+    color: '#FC1055',
+    fontWeight: 'bold',
     fontSize: 16
   },
 });

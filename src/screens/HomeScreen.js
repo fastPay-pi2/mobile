@@ -23,9 +23,9 @@ export default class HomeScreen extends React.Component {
       borderRadius: 10,
       height: 66
     },
-    headerTitleStyle: { 
-      textAlign:"center", 
-      flex:1 
+    headerTitleStyle: {
+      textAlign:'center',
+      flex:1
     }
   };
 
@@ -71,32 +71,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff'
   },
-  contentContainer: {
-    paddingTop: 30,
-  },
   button: {
+    alignItems: 'center',
     paddingVertical: 18,
-    borderRadius: 8,
+    marginHorizontal: 96,
+    marginTop: 40,
     backgroundColor: '#FC1055',
+    borderRadius: 8,
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    height: 46,
-    alignSelf: "stretch",
-    justifyContent: "center",
-    marginRight: 96,
-    marginLeft: 96,
-    marginTop: 40,
-    alignItems: "center",
   },
   buttonText: {
-    color: "#FFF",
-    fontWeight: "bold",
+    color: '#FFF',
+    fontWeight: 'bold',
     fontSize: 16
   },
   title: {
-    color: "#000",
-    fontWeight: "bold",
+    color: '#000',
+    fontWeight: 'bold',
     fontSize: 26
   },
   containerPurchases: {
