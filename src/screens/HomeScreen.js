@@ -48,10 +48,6 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
-    this.data = [
-      {time: '09:00', title: 'TERÇA-FEIRA, 12 DE AGOSTO', description: 'R$ 37,50  PAGO'},
-      {time: '10:45', title: 'SEGUNDA-FEIRA, 11 DE AGOSTO', description: 'R$ 3,00  PAGO'}
-    ]
     return (
       <SafeAreaView  style={styles.container}>
           <TouchableOpacity

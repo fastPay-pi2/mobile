@@ -78,7 +78,7 @@ export default class QRCodeScannerScreen extends React.Component {
     api.purchase.post('/api/purchase/', body)
     .then( async res => {
       console.log(res)
-      alert(`Carrinho ${data}`);
+      alert(`Compra cadastrada`);
       this.props.navigation.navigate('Shopping');
     })
     .catch(error => {
