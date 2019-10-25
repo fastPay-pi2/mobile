@@ -6,7 +6,7 @@ import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
 import { Constants, WebBrowser } from 'expo';
-import {x_picpay_token, x_seller_token} from '../config/picPayToken';
+// import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 
 const products = [
   {
@@ -153,7 +153,7 @@ export default class ShoppingScreen extends React.Component {
 
         <View style={styles.footer}>
 
-          <Text style={{alignSelf: 'center'}}>R$100,00</Text>
+          <Text style={{alignSelf: 'center'}}>R$0,00</Text>
 
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}

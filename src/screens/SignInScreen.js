@@ -93,7 +93,7 @@ export default class SignInScreen extends React.Component {
       'password': this.state.password,
     }
     
-    api.post('/sessions', body)
+    api.auth.post('/sessions', body)
     .then( async res => {
       if (res.data.token) {
         await AsyncStorage.setItem('userToken', res.data.token);
