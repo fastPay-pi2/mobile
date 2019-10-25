@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://172.16.1.23' 
+const baseUrl = 'http://192.168.100.125' 
 const authUrl = baseUrl + ':3001'
 const purchaseUrl = baseUrl + ':5000'
 

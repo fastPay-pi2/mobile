@@ -6,7 +6,7 @@ import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
 import { Constants, WebBrowser } from 'expo';
-// import {x_picpay_token, x_seller_token} from '../config/picPayToken';
+import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 
 const products = [
   {
@@ -87,7 +87,7 @@ export default class ShoppingScreen extends React.Component {
     }
 
     body = {
-      'referenceId': '6',
+      'referenceId': '10',
       'callbackUrl': 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
       'value': 0.01,
       'buyer': {
