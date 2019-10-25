@@ -85,14 +85,14 @@ export default class SignInScreen extends React.Component {
 
     );
   }
-  
+
   _signInAsync = async () => {
     this.setState({ isLoading: true })
     const body = {
       'email': this.state.email,
       'password': this.state.password,
     }
-    
+
     api.post('/sessions', body)
     .then( async res => {
       if (res.data.token) {
@@ -107,9 +107,12 @@ export default class SignInScreen extends React.Component {
       if (error.response.data.error === 'User not found') {
         this.setState({messageError: 'Usuário ou senha inválida'});
         this.setState({ isLoading:false })
+      } else if (error.response.data.error === 'Invalid password') {
+        this.setState({messageError: 'Senha inválida'});
+        this.setState({ isLoading:false })
       }
     })
-    
+
   };
 }
 
