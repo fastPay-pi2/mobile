@@ -35,8 +35,13 @@ services:
 
   products_api:
     image: registry.gitlab.com/fastpay-pi2/products-api/app:latest
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db
+      - POSTGRES_HOST=products_db
+      - POSTGRES_PORT=5432
+      - PRODUCT_API_URL=http://products_api:3000
     depends_on:
       - products_db
     networks:
@@ -49,12 +54,48 @@ services:
     image: registry.gitlab.com/fastpay-pi2/products-api/db:latest
     networks:
       - products
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db
+      - POSTGRES_HOST=products_db
+      - POSTGRES_PORT=5432
+      - PRODUCT_API_URL=http://products_api:3000
     ports:
       - "5432:5432"
+
+  purchase_api:
+    image: registry.gitlab.com/fastpay-pi2/purchase-api/app:latest
+    networks:
+      - fastpay
+      - purchase
+    ports:
+      - 5000:5000
+    depends_on:
+      - purchase_db
+    environment:
+      - DB_NAME=purchase
+      - DB_URL=mongodb://purchase_db:27018/purchase
+      - DB_TEST_NAME=purchase_test
+      - DB_TEST_URL=mongodb://purchase_db:27018/purchase_test
+      - FLASK_APP=application/__init__.py
+      - FLASK_ENV=development
+      - APP_SETTINGS=application.config.DevelopmentConfig
+      - PRODUCTS_API=http://products_api:3000/
+  
+  purchase_db:
+    image: mongo
+    command: mongod --port 27018
+    volumes:
+      - /mongo_purchase:/data/db
+    networks:
+      - purchase
+    ports:
+      - 27018:27018
+
 
 networks:
   fastpay:
   auth:
   products:
+  purchase:
