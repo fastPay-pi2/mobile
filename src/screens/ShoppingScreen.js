@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions } from 'react-native';
 import ShoppingList from '../components/ShoppingList'
 import { AntDesign } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
@@ -13,29 +13,29 @@ const products = [
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
     name: 'tio joão',
     image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hb1/he1/h00/h00/9452863029278.jpg',
-    price: '10.40',
-    qntd: '4',
+    price: 10.40,
+    qntd: 4,
   },
   {
     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
     name: 'camil feijão',
     image: 'https://static.carrefour.com.br/medias/sys_master/images/images/h71/hd4/h00/h00/9455430107166.jpg',
-    price: '12.30',
-    qntd: '2',
+    price: 12.30,
+    qntd: 2,
   },
   {
     id: '58694a0f-3da1-471f-bd96-145571e29d72',
     name: 'camil arroz',
     image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hfb/h28/h00/h00/9476860543006.jpg',
-    price: '14.15',
-    qntd: '5',
+    price: 14.15,
+    qntd: 5,
   },
   {
     id: '58694a0f-3da1-571f-bd96-145571e29d72',
     name: 'broto legal',
     image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hef/h6b/h00/h00/9446694060062.jpg',
-    price: '16.50',
-    qntd: '6',
+    price: 16.50,
+    qntd: 6,
   },
 ];
 
@@ -87,7 +87,7 @@ export default class ShoppingScreen extends React.Component {
     }
 
     body = {
-      'referenceId': '6',
+      'referenceId': '7',
       'callbackUrl': 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
       'value': 0.01,
       'buyer': {
@@ -104,7 +104,6 @@ export default class ShoppingScreen extends React.Component {
       console.log(res);
       console.log(res.data.paymentUrl);
       Linking.openURL(res.data.paymentUrl);
-      // console.log(res);
     })
     .catch(error => {
       console.log(error.response);
@@ -116,16 +115,21 @@ export default class ShoppingScreen extends React.Component {
   _renderProduct(product) {
     return(
       <View style={{flexDirection: 'row'}}>
-        <Image style={{
-          width: 120,
-          height: 180,
-        }} source={{uri: product.image}}/>
-      <View style={{flexDirection: 'column', justifyContent: 'center'}}>
+        <Image style={styles.productImage} source={{uri: product.image}}/>
+        <View style={{flexDirection: 'column', justifyContent: 'center'}}>
           <Text>{product.name}</Text>
           <Text>R$ {product.price} x {product.qntd}</Text>
         </View>
       </View>
     )
+  }
+
+  calculateTotal = () => {
+    let total = 0;
+    products.map(product => {
+      total += (product.price * product.qntd)
+    })
+    return total
   }
 
   render() {
@@ -142,9 +146,8 @@ export default class ShoppingScreen extends React.Component {
               </View>
             ) : (
               <FlatList
-                style={styles.shopping}
+                style={styles.productsList}
               keyExtractor={item => item.id}
-              ItemSeparatorComponent={() => <View style={{width: 30}} />}
               renderItem={({item}) => this._renderProduct(item)}
               data={products}
               />
@@ -152,10 +155,9 @@ export default class ShoppingScreen extends React.Component {
           }
 
         <View style={styles.footer}>
-
-          <Text style={{alignSelf: 'center'}}>R$100,00</Text>
-
+          <Text style={{alignSelf: 'center'}}>R$ {this.calculateTotal()}</Text>
           <ButtonWithActivityIndicator
+            disabled={this.state.shopping}
             activityIndicatorStyle={styles.loading}
             onPress={() => {
               this.buy();
@@ -163,7 +165,7 @@ export default class ShoppingScreen extends React.Component {
             isLoading={this.state.isLoading}
             buttonKey='Pagar'
             buttonText='Pagar'
-            buttonStyle={styles.buttonLogin}
+            buttonStyle={styles.buttonPay}
           />
 
         </View>
@@ -172,8 +174,11 @@ export default class ShoppingScreen extends React.Component {
   };
 }
 
+const { height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
-  buttonLogin: {
+  buttonPay: {
     paddingVertical: 20,
     paddingHorizontal: 60,
     borderRadius: 8,
@@ -186,16 +191,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
-    paddingTop: 0,
-  },
   shopping: {
     flex: 1,
+    alignItems: 'center',
     margin: 50,
     padding: 10,
   },
+  productsList: {
+    flex: 1,
+    padding: 10,
+  },
   footer: {
-    flex: 0.2,
+    height: height * 14/100,
     borderTopColor: '#A9A9A9',
     borderTopWidth: 0.5,
     backgroundColor: '#f2f2f2',
@@ -207,5 +214,10 @@ const styles = StyleSheet.create({
   loading: {
     marginTop: 50,
     paddingVertical: 13,
+  },
+  productImage: {
+    width: 90,
+    height: 150,
+    padding: 50
   },
 });
