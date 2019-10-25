@@ -6,7 +6,7 @@ import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
 import { Constants, WebBrowser } from 'expo';
-import {x_picpay_token, x_seller_token} from '../config/picPayToken';
+// import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 
 const products = [
   {

@@ -1,5 +1,6 @@
 import React from 'react';
 import Timeline from 'react-native-timeline-listview'
+import api from '../config/api'
 import {
   AsyncStorage,
   Platform,
@@ -14,7 +15,24 @@ import {
 
 export default class HomeScreen extends React.Component {
   state = {
+    purchases: []
   };
+
+  async componentDidMount(props) {
+    const userId = await AsyncStorage.getItem('userId');
+    api.purchase.get(`/api/userpurchases/${userId}`)
+    .then( async res => {
+      console.log(res)
+    })
+    .catch(error => {
+      console.log(error.response);
+    })
+    var purchases = [
+      {time: '09:00', title: 'TERÇA-FEIRA, 12 DE AGOSTO', description: 'R$ 37,50  PAGO'},
+      {time: '10:45', title: 'SEGUNDA-FEIRA, 11 DE AGOSTO', description: 'R$ 3,00  PAGO'}
+    ]
+    this.setState({ purchases })
+  }
 
   static navigationOptions = {
     title: 'Home',
@@ -30,17 +48,6 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
-    this.data = [
-      {time: '09:00', title: 'Event 1', description: 'Event 1 Description'},
-      {time: '10:45', title: 'Event 2', description: 'Event 2 Description'},
-      {time: '12:00', title: 'Event 3', description: 'Event 3 Description'},
-      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
-      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
-      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
-      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
-      {time: '14:00', title: 'Event 4', description: 'Event 4 Description'},
-      {time: '16:30', title: 'Event 5', description: 'Event 5 Description'}
-    ]
     return (
       <SafeAreaView  style={styles.container}>
           <TouchableOpacity
@@ -57,7 +64,7 @@ export default class HomeScreen extends React.Component {
                 lineColor='#EDEFF2'
                 circleColor='#FC1055'
                 style={styles.timeLine}
-                data={this.data}
+                data={this.state.purchases}
               />
             </ScrollView>
           </View>

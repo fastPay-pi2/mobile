@@ -1,7 +1,18 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://192.168.100.119:3001'
+const baseUrl = 'http://172.16.1.23' 
+const authUrl = baseUrl + ':3001'
+const purchaseUrl = baseUrl + ':5000'
+
+const auth = axios.create({
+  baseURL: `${baseUrl}:3001`
 });
 
-export default api
+const purchase = axios.create({
+  baseURL: `${baseUrl}:5000`
+});
+
+export default {
+  auth,
+  purchase
+}

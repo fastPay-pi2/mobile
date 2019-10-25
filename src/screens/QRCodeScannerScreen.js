@@ -13,7 +13,7 @@ import {
 import { HeaderBackButton } from 'react-navigation';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-
+import api from '../config/api'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default class QRCodeScannerScreen extends React.Component {
@@ -67,10 +67,24 @@ export default class QRCodeScannerScreen extends React.Component {
     );
   }
 
-  handleQRCodeScanned = ({ type, data }) => {
+  handleQRCodeScanned = async ({ type, data }) => {
     this.setState({ scanned: true });
-    alert(`${data}`);
-    this.props.navigation.navigate('Shopping');
+    const userId = await AsyncStorage.getItem('userId');
+    const body = {
+      'user_id': userId,
+      'cart_id': data,
+    }
+    console.log(body)
+    api.purchase.post('/api/purchase/', body)
+    .then( async res => {
+      console.log(res)
+      alert(`Compra cadastrada`);
+      this.props.navigation.navigate('Shopping');
+    })
+    .catch(error => {
+      console.log(error.response);
+      alert(`Carrinho ${data} inválido`);
+    })
   };
 
   showNoPermissionAlert() {
