@@ -167,9 +167,11 @@ export default class RegisterScreen extends React.Component {
       'idAdmin': false,
     }
 
-    api.post('/users', body)
+    api.auth.post('/users', body)
     .then( res => {
-      if (res.status === '200') {
+      console.log(res);
+      if (res.status === 200) {
+        this.setState({ isLoading: false });
         this.props.navigation.navigate('SignIn');
       }
     })
@@ -178,7 +180,7 @@ export default class RegisterScreen extends React.Component {
 
       if (error.response.data.error === 'User already exists') {
         this.setState({messageError: 'Usuário já existe'});
-        this.setState({ isLoading:false })
+        this.setState({ isLoading: false });
       }
     })
     // await AsyncStorage.setItem('userToken', '');
