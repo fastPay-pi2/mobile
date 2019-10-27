@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions, AsyncStorage, Alert } from 'react-native';
 import ShoppingList from '../components/ShoppingList'
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
 import { Constants, WebBrowser } from 'expo';
-// import {x_picpay_token, x_seller_token} from '../config/picPayToken';
+import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 
 const products = [
   {
@@ -43,8 +43,12 @@ export default class ShoppingScreen extends React.Component {
   state = {
     isLoading: false,
     shopping: true,
-
+    totalPrice: 0,
   };
+
+  componentDidMount() {
+    this.props.navigation.setParams({ cancelPurchase: this.cancelPurchaseConfirmation.bind(this) });
+  }
 
   static navigationOptions = ({navigation}) => {
     return {
@@ -57,7 +61,15 @@ export default class ShoppingScreen extends React.Component {
       headerTitleStyle: {
         textAlign:'center',
         flex:1
-      }
+      },
+      headerRight: (
+        <MaterialCommunityIcons
+          style={{paddingRight: 25}}
+          name='cart-off'
+          size={26}
+          onPress={navigation.getParam('cancelPurchase')}
+          />
+      )
     }
   };
 
@@ -79,22 +91,27 @@ export default class ShoppingScreen extends React.Component {
     })
   }
 
-  buy = () => {
+  buy = async () => {
     header = {
       headers: {
         'x-picpay-token': x_picpay_token,
       }
     }
 
+    const purchaseId = await AsyncStorage.getItem('purchaseId');
+    const name = await AsyncStorage.getItem('userName');
+    const cpf =  await AsyncStorage.getItem('userCPF');
+    const email = await AsyncStorage.getItem('userEmail');
+
     body = {
-      'referenceId': '7',
+      'referenceId': purchaseId,
       'callbackUrl': 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
-      'value': 0.01,
+      'value': this.state.totalPrice,
       'buyer': {
         'firstName': 'Lucas',
         'lastName': 'Penido',
-        'document': '056.259.651-88',
-        'email': 'lpenidoa@me.com',
+        'document': cpf,
+        'email': email,
         'phone': '+55 61 993458-3238'
       }
     }
@@ -124,12 +141,41 @@ export default class ShoppingScreen extends React.Component {
     )
   }
 
-  calculateTotal = () => {
-    let total = 0;
+  calculateTotal() {
+    console.log('entrou');
+    let totalPrice = 0;
     products.map(product => {
-      total += (product.price * product.qntd)
+      totalPrice += (product.price * product.qntd)
     })
-    return total
+    this.setState({totalPrice})
+
+    return totalPrice;
+  }
+
+
+  cancelPurchaseConfirmation = () => {
+    Alert.alert(
+    'Cancelar Compra',
+    'Tem certeza que deseja cancelar a sua compra?',
+    [
+      {
+        text: 'Sim',
+        onPress: async () => {
+          await AsyncStorage.removeItem('purchaseId');
+          await AsyncStorage.removeItem('cartRfid');
+          // TODO Request to cancel purchase at API
+          alert('Compra cancelada');
+          this.props.navigation.navigate('Home');
+        },
+        style: 'default'
+      },
+      {
+        text: 'Não',
+        style: 'cancel'
+      }
+    ],
+    {cancelable: false},
+    );
   }
 
   render() {
@@ -142,7 +188,11 @@ export default class ShoppingScreen extends React.Component {
                 <Image source={require('../assets/images/ShoppingCar.gif')}
                 style={{width: 150, height: 150, }}/>
                 <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
-                <Button title='mostrar lista' onPress={() => this.setState({shopping : false})}/>
+                <Button title='mostrar lista' onPress={() => {
+                    this.calculateTotal();
+                    this.setState({shopping : false});
+                  }}
+                />
               </View>
             ) : (
               <FlatList
@@ -155,7 +205,13 @@ export default class ShoppingScreen extends React.Component {
           }
 
         <View style={styles.footer}>
-          <Text style={{alignSelf: 'center'}}>R$ {this.calculateTotal()}</Text>
+          {
+            this.state.shopping ? (
+              null
+            ) : (
+              <Text style={{alignSelf: 'center'}}>R$ {this.state.totalPrice}</Text>
+            )
+          }
           <ButtonWithActivityIndicator
             disabled={this.state.shopping}
             activityIndicatorStyle={styles.loading}
