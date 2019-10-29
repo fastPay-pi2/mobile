@@ -12,7 +12,8 @@ import ShoppingScreen from '../screens/ShoppingScreen';
 
 
 const AuthStack = createStackNavigator({ SignIn: SignInScreen, Register: RegisterScreen });
-const ShoppingStack = createStackNavigator({ Scan: QRCodeScannerScreen, Shopping: ShoppingScreen });
+const QrCodeStack = createStackNavigator({ Scan: QRCodeScannerScreen });
+const ShoppingStack = createStackNavigator({ Shopping: ShoppingScreen });
 const ShoppingListStack = createStackNavigator({ CreateShoppingList: CreateNewShoppingListScreen });
 
 export default createAppContainer(
@@ -20,6 +21,7 @@ export default createAppContainer(
     AuthLoading: AuthLoadingScreen,
     App: MainTabNavigator,
     Auth: AuthStack,
+    Scan: QrCodeStack,
     Shopping: ShoppingStack,
     ShoppingList: ShoppingListStack,
   },

@@ -85,20 +85,22 @@ export default class SignInScreen extends React.Component {
 
     );
   }
-  
+
   _signInAsync = async () => {
     this.setState({ isLoading: true })
     const body = {
       'email': this.state.email,
       'password': this.state.password,
     }
-    
+
     api.auth.post('/sessions', body)
     .then( async res => {
       if (res.data.token) {
         await AsyncStorage.setItem('userToken', res.data.token);
         await AsyncStorage.setItem('userName', res.data.user.name);
         await AsyncStorage.setItem('userId', res.data.user._id);
+        await AsyncStorage.setItem('userCPF', res.data.user.cpf);
+        await AsyncStorage.setItem('userEmail', res.data.user.email);
         this.props.navigation.navigate('App');
       }
     })
@@ -106,10 +108,11 @@ export default class SignInScreen extends React.Component {
       console.log(error.response);
       if (error.response.data.error === 'User not found') {
         this.setState({messageError: 'Usuário ou senha inválida'});
-        this.setState({ isLoading:false })
+      } else if (error.response.data.error === 'Invalid password') {
+        this.setState({messageError: 'Senha inválida'});
       }
+      this.setState({ isLoading: false })
     })
-    
   };
 }
 
