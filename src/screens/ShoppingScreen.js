@@ -7,6 +7,7 @@ import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicat
 import axios from 'axios';
 import { Constants, WebBrowser } from 'expo';
 import {x_picpay_token, x_seller_token} from '../config/picPayToken';
+import api from '../config/api'
 
 const products = [
   {
@@ -47,7 +48,7 @@ export default class ShoppingScreen extends React.Component {
   };
 
   componentDidMount() {
-    this.props.navigation.setParams({ cancelPurchase: this.cancelPurchaseConfirmation.bind(this) });
+    this.props.navigation.setParams({ cancelPurchaseConfirmation: this.cancelPurchaseConfirmation.bind(this) });
   }
 
   static navigationOptions = ({navigation}) => {
@@ -67,7 +68,7 @@ export default class ShoppingScreen extends React.Component {
           style={{paddingRight: 25}}
           name='cart-off'
           size={26}
-          onPress={navigation.getParam('cancelPurchase')}
+          onPress={navigation.getParam('cancelPurchaseConfirmation')}
           />
       )
     }
@@ -142,7 +143,6 @@ export default class ShoppingScreen extends React.Component {
   }
 
   calculateTotal() {
-    console.log('entrou');
     let totalPrice = 0;
     products.map(product => {
       totalPrice += (product.price * product.qntd)
@@ -152,6 +152,22 @@ export default class ShoppingScreen extends React.Component {
     return totalPrice;
   }
 
+  async changePurchaseStatus(status) {
+    const userId = await AsyncStorage.getItem('userId');
+    body = {
+      'new_state': status,
+    }
+    api.purchase.put('/api/purchase/' + userId, body)
+    .then( async res => {
+      await AsyncStorage.removeItem('purchaseId');
+      await AsyncStorage.removeItem('cartRfid');
+      alert('Compra cancelada');
+      this.props.navigation.navigate('Home');
+    })
+    .catch(error => {
+      console.log(error.response.data.error);
+    })
+  }
 
   cancelPurchaseConfirmation = () => {
     Alert.alert(
@@ -161,11 +177,7 @@ export default class ShoppingScreen extends React.Component {
       {
         text: 'Sim',
         onPress: async () => {
-          await AsyncStorage.removeItem('purchaseId');
-          await AsyncStorage.removeItem('cartRfid');
-          // TODO Request to cancel purchase at API
-          alert('Compra cancelada');
-          this.props.navigation.navigate('Home');
+          await this.changePurchaseStatus('ABORTED');
         },
         style: 'default'
       },
