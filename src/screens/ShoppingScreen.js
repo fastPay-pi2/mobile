@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions, AsyncStorage, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions, AsyncStorage, Alert, RefreshControl } from 'react-native';
 import ShoppingList from '../components/ShoppingList'
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
@@ -44,6 +44,8 @@ export default class ShoppingScreen extends React.Component {
   state = {
     isLoading: false,
     shopping: true,
+    refreshing: false,
+    products: [],
     totalPrice: 0,
   };
 
@@ -133,23 +135,13 @@ export default class ShoppingScreen extends React.Component {
   _renderProduct(product) {
     return(
       <View style={{flexDirection: 'row'}}>
-        <Image style={styles.productImage} source={{uri: product.image}}/>
+        <Image style={styles.productImage} source={{uri: product.productimage}}/>
         <View style={{flexDirection: 'column', justifyContent: 'center'}}>
-          <Text>{product.name}</Text>
-          <Text>R$ {product.price} x {product.qntd}</Text>
+          <Text>{product.productname}</Text>
+          <Text>R$ {product.productprice} x {product.qntd}</Text>
         </View>
       </View>
     )
-  }
-
-  calculateTotal() {
-    let totalPrice = 0;
-    products.map(product => {
-      totalPrice += (product.price * product.qntd)
-    })
-    this.setState({totalPrice})
-
-    return totalPrice;
   }
 
   async changePurchaseStatus(status) {
@@ -171,50 +163,75 @@ export default class ShoppingScreen extends React.Component {
 
   cancelPurchaseConfirmation = () => {
     Alert.alert(
-    'Cancelar Compra',
-    'Tem certeza que deseja cancelar a sua compra?',
-    [
-      {
-        text: 'Sim',
-        onPress: async () => {
-          await this.changePurchaseStatus('ABORTED');
+      'Cancelar Compra',
+      'Tem certeza que deseja cancelar a sua compra?',
+      [
+        {
+          text: 'Sim',
+          onPress: async () => {
+            await this.changePurchaseStatus('ABORTED');
+          },
+          style: 'default'
         },
-        style: 'default'
-      },
-      {
-        text: 'Não',
-        style: 'cancel'
-      }
-    ],
-    {cancelable: false},
+        {
+          text: 'Não',
+          style: 'cancel'
+        }
+      ],
+      {cancelable: false},
     );
+  }
+
+  updatePurchase = async () => {
+    this.setState({refreshing: true});
+    const userId = await AsyncStorage.getItem('userId');
+    console.log(userId);
+    api.purchase.get('/api/userpurchases/' + userId)
+    .then(res => {
+      const currentPurchase = res.data.find(element => {
+        return element.state === 'ONGOING' || element.state === 'PAYING';
+      });
+
+      if (currentPurchase.state === 'ONGOING') {
+        alert('Sem nenhuma atualização');
+      } else {
+        this.setState({ totalPrice: currentPurchase.value });
+        this.setState({ products: currentPurchase.purchased_products });
+        this.setState({ shopping: false });
+      }
+
+      this.setState({refreshing: false});
+    })
+    .catch(error => {
+      console.log(error);
+      alert('Erro ao atualizar compras');
+      this.setState({refreshing: false});
+    })
   }
 
   render() {
     return (
       <View style={styles.container}>
-          {
-            this.state.shopping ?
-            (
+        {
+          this.state.shopping ?
+          (
+            <ScrollView>
+              <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.updatePurchase()}/>
               <View style={styles.shopping}>
                 <Image source={require('../assets/images/ShoppingCar.gif')}
-                style={{width: 150, height: 150, }}/>
+                  style={{width: 150, height: 150, }}/>
                 <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
-                <Button title='mostrar lista' onPress={() => {
-                    this.calculateTotal();
-                    this.setState({shopping : false});
-                  }}
-                />
               </View>
-            ) : (
-              <FlatList
-                style={styles.productsList}
-              keyExtractor={item => item.id}
+            </ScrollView>
+          ) : (
+            <FlatList
+              style={styles.productsList}
+              keyExtractor={item => item.productid.toString()}
               renderItem={({item}) => this._renderProduct(item)}
-              data={products}
+              data={this.state.products}
               />
-            )
-          }
+          )
+        }
 
         <View style={styles.footer}>
           {
@@ -234,7 +251,7 @@ export default class ShoppingScreen extends React.Component {
             buttonKey='Pagar'
             buttonText='Pagar'
             buttonStyle={styles.buttonPay}
-          />
+            />
 
         </View>
       </View>
