@@ -85,6 +85,9 @@ export default class QRCodeScannerScreen extends React.Component {
     })
     .catch(error => {
       console.log(error.response);
+      if (error.response.data.error === 'There is a pending purchase') {
+        alert('Este carrinho já está associado à uma compra ')
+      }
       alert(`Carrinho ${cartRfid} inválido`);
     })
   };
