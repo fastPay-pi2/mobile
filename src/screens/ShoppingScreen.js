@@ -16,11 +16,25 @@ export default class ShoppingScreen extends React.Component {
     refreshing: false,
     products: [],
     totalPrice: 0,
+    painding: false,
+    paid: false,
   };
 
   componentDidMount() {
     this.props.navigation.setParams({ cancelPurchaseConfirmation: this.cancelPurchaseConfirmation.bind(this) });
   }
+
+  timerPurchase = setInterval( () => {
+    console.log('purchase');
+    this.updatePurchase();
+  },2000);
+
+  timerStatus = setInterval( () => {
+    if (this.state.painding) {
+      console.log('status');
+      this.verifyStatus();
+    }
+  },2000);
 
   static navigationOptions = ({navigation}) => {
     return {
@@ -45,18 +59,34 @@ export default class ShoppingScreen extends React.Component {
     }
   };
 
-  verifyStatus = () => {
+  verifyStatus = async () => {
     header = {
       headers: {
         'x-picpay-token': x_picpay_token,
       }
     }
 
-    referenceId = 5;
+    const purchaseId = await AsyncStorage.getItem('purchaseId');
 
-    axios.get('https://appws.picpay.com/ecommerce/public/payments/'+ referenceId + '/status', header)
+    axios.get('https://appws.picpay.com/ecommerce/public/payments/'+ purchaseId + '/status', header)
     .then(res => {
-      console.log(res);
+      console.log(res.data.status);
+      if (res.data.status === 'paid') {
+        Alert.alert(
+          'Compra Finalizada Com Sucesso',
+          'Sua compra foi paga e finalizada',
+          [
+            {
+              text: 'OK',
+              onPress: async () => {
+                await this.changePurchaseStatus('COMPLETED');
+              },
+              style: 'default'
+            },
+          ],
+          {cancelable: false},
+        );
+      }
     })
     .catch(error => {
       console.log(error.response);
@@ -92,6 +122,8 @@ export default class ShoppingScreen extends React.Component {
     .then(res => {
       console.log(res);
       console.log(res.data.paymentUrl);
+      clearInterval(this.timerPurchase);
+      this.setState({ painding: true });
       Linking.openURL(res.data.paymentUrl);
     })
     .catch(error => {
@@ -111,6 +143,8 @@ export default class ShoppingScreen extends React.Component {
       await AsyncStorage.removeItem('purchaseId');
       await AsyncStorage.removeItem('cartRfid');
       alert('Compra cancelada');
+      clearInterval(this.timerPurchase);
+      clearInterval(this.timerStatus);
       this.props.navigation.navigate('Home');
     })
     .catch(error => {
@@ -179,19 +213,20 @@ export default class ShoppingScreen extends React.Component {
   }
 
   render() {
+    // setTimeout(() => {console.log('hi'); }, 5000);
     return (
       <View style={styles.container}>
         {
           this.state.shopping ?
           (
-            <ScrollView>
-              <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.updatePurchase()}/>
+            // <ScrollView>
+              // <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.updatePurchase()}/>
               <View style={styles.shopping}>
                 <Image source={require('../assets/images/ShoppingCar.gif')}
                   style={{width: 150, height: 150, }}/>
                 <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
               </View>
-            </ScrollView>
+            // </ScrollView>
           ) : (
             <FlatList
               style={styles.productsList}
