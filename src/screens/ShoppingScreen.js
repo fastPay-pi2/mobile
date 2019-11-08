@@ -9,37 +9,6 @@ import { Constants, WebBrowser } from 'expo';
 import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 import api from '../config/api'
 
-const products = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    name: 'tio joão',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hb1/he1/h00/h00/9452863029278.jpg',
-    price: 10.40,
-    qntd: 4,
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    name: 'camil feijão',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/h71/hd4/h00/h00/9455430107166.jpg',
-    price: 12.30,
-    qntd: 2,
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    name: 'camil arroz',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hfb/h28/h00/h00/9476860543006.jpg',
-    price: 14.15,
-    qntd: 5,
-  },
-  {
-    id: '58694a0f-3da1-571f-bd96-145571e29d72',
-    name: 'broto legal',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hef/h6b/h00/h00/9446694060062.jpg',
-    price: 16.50,
-    qntd: 6,
-  },
-];
-
 export default class ShoppingScreen extends React.Component {
   state = {
     isLoading: false,
@@ -132,18 +101,6 @@ export default class ShoppingScreen extends React.Component {
 
   }
 
-  _renderProduct(product) {
-    return(
-      <View style={{flexDirection: 'row'}}>
-        <Image style={styles.productImage} source={{uri: product.productimage}}/>
-        <View style={{flexDirection: 'column', justifyContent: 'center'}}>
-          <Text>{product.productname}</Text>
-          <Text>R$ {product.productprice} x {product.qntd}</Text>
-        </View>
-      </View>
-    )
-  }
-
   async changePurchaseStatus(status) {
     const userId = await AsyncStorage.getItem('userId');
     body = {
@@ -191,22 +148,34 @@ export default class ShoppingScreen extends React.Component {
       const currentPurchase = res.data.find(element => {
         return element.state === 'ONGOING' || element.state === 'PAYING';
       });
+      this.setState({refreshing: false});
 
-      if (currentPurchase.state === 'ONGOING') {
-        alert('Sem nenhuma atualização');
-      } else {
+      if (currentPurchase.state === 'PAYING') {
         this.setState({ totalPrice: currentPurchase.value });
         this.setState({ products: currentPurchase.purchased_products });
         this.setState({ shopping: false });
       }
-
-      this.setState({refreshing: false});
     })
     .catch(error => {
       console.log(error);
-      alert('Erro ao atualizar compras');
       this.setState({refreshing: false});
+      alert('Erro ao atualizar compras');
     })
+  }
+
+  _renderProduct(product) {
+    return(
+      <View style={styles.productView}>
+        <Image style={styles.productImage} source={{uri: product.productimage}}/>
+        <View style={styles.productInformation}>
+          <Text style={styles.productName}>{product.productname}</Text>
+          <View style={{flex:1, alignItems:'center'}}>
+            <Text style={{fontSize: 20, paddingBottom: 5}}>R$ {product.productprice}</Text>
+            <Text style={{fontSize: 14}}>{product.quantity} un</Text>
+          </View>
+        </View>
+      </View>
+    )
   }
 
   render() {
@@ -238,7 +207,7 @@ export default class ShoppingScreen extends React.Component {
             this.state.shopping ? (
               null
             ) : (
-              <Text style={{alignSelf: 'center'}}>R$ {this.state.totalPrice}</Text>
+              <Text style={{alignSelf: 'center', fontSize: 20}}>R$ {this.state.totalPrice}</Text>
             )
           }
           <ButtonWithActivityIndicator
@@ -284,7 +253,6 @@ const styles = StyleSheet.create({
   },
   productsList: {
     flex: 1,
-    padding: 10,
   },
   footer: {
     height: height * 14/100,
@@ -300,9 +268,27 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingVertical: 13,
   },
-  productImage: {
-    width: 90,
-    height: 150,
-    padding: 50
+  productView: {
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    padding: 10,
+    borderBottomColor: '#A9A9A9',
   },
+  productImage: {
+    flex: 1,
+    height: 100,
+  },
+  productInformation: {
+    flex: 2.8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+  },
+  productName: {
+    fontSize: 20,
+    flex: 2,
+    fontFamily: 'Roboto-Regular',
+    padding: 5
+  }
 });

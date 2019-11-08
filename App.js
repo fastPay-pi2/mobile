@@ -43,6 +43,8 @@ async function loadResourcesAsync() {
       'space-mono': require('./src/assets/fonts/SpaceMono-Regular.ttf'),
       'work-sans-semiBold': require('./src/assets/fonts/WorkSans-SemiBold.otf'),
       'nunito': require('./src/assets/fonts/Nunito-Regular.ttf'),
+      'Montserrat-Medium': require('./src/assets/fonts/Montserrat-Medium.ttf'),
+      'Roboto-Regular': require('./src/assets/fonts/Roboto-Regular.ttf'),
     }),
   ]);
 }
