@@ -12,7 +12,7 @@ expo-deployments:
   stage: deploy
   script:
     - apk add --no-cache bash
-    - npx expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD
+    - npx expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD --non-interactive
     - npx expo publish --non-interactive
   only:
     - master
