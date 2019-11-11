@@ -7,7 +7,7 @@ cache:
 stages:
   - deploy
 before_script:
-  - npm i
+  - npm ci
 expo-deployments:
   stage: deploy
   script:
@@ -17,4 +17,3 @@ expo-deployments:
     - npx expo publish --non-interactive
   only:
     - master
-    - devel
