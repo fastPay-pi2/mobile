@@ -8,7 +8,6 @@ npm-debug.*
 *.orig.*
 web-build/
 web-report/
-package-lock.json
 
 # Created by https://www.gitignore.io/api/reactnative
 # Edit at https://www.gitignore.io/?templates=reactnative
@@ -97,7 +96,7 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# react / gatsby 
+# react / gatsby
 public/
 
 # vuepress build output
