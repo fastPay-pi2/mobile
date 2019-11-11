@@ -16,3 +16,4 @@ expo-deployments:
     - npx expo publish --non-interactive
   only:
     - master
+    - devel
