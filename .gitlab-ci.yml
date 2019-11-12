@@ -7,7 +7,7 @@ cache:
 stages:
   - deploy
 before_script:
-  - npm ci
+  - npm i
 expo-deployments:
   stage: deploy
   script:
