@@ -13,7 +13,7 @@ import {
 import { HeaderBackButton } from 'react-navigation';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-
+import api from '../config/api'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default class QRCodeScannerScreen extends React.Component {
@@ -26,6 +26,11 @@ export default class QRCodeScannerScreen extends React.Component {
     return {
       title: 'Escaneie o código QR',
       headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
+      headerStyle: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 66
+      }
     };
   };
 
@@ -62,10 +67,29 @@ export default class QRCodeScannerScreen extends React.Component {
     );
   }
 
-  handleQRCodeScanned = ({ type, data }) => {
+  handleQRCodeScanned = async ({ type, data }) => {
+    const cartRfid = data;
     this.setState({ scanned: true });
-    alert(`${data}`);
-    this.props.navigation.navigate('Shopping');
+    const userId = await AsyncStorage.getItem('userId');
+    const body = {
+      'user_id': userId,
+      'cart_id': cartRfid,
+    }
+
+    api.purchase.post('/api/purchase/', body)
+    .then( async res => {
+      await AsyncStorage.setItem('purchaseId', res.data.id);
+      await AsyncStorage.setItem('cartRfid', cartRfid);
+      alert(`Compra cadastrada`);
+      this.props.navigation.navigate('Shopping');
+    })
+    .catch(error => {
+      console.log(error.response);
+      if (error.response.data.error === 'There is a pending purchase') {
+        alert('Este carrinho já está associado à uma compra ')
+      }
+      alert(`Carrinho ${cartRfid} inválido`);
+    })
   };
 
   showNoPermissionAlert() {
@@ -94,8 +118,9 @@ export default class QRCodeScannerScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
+    marginHorizontal: 0, marginLeft: 0, marginStart: 0,
+    paddingHorizontal: 0, paddingLeft: 0, paddingStart: 0,
+    height: '115%',
+    padding: 0
   },
 });

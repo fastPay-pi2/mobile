@@ -15,6 +15,7 @@ import {
   BackHandler,
   Dimensions,
 } from 'react-native';
+import api from '../config/api'
 import CpfField from '../components/CpfField'
 import NameField from '../components/NameField'
 import UsernameField from '../components/UsernameField'
@@ -57,6 +58,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 15,
   },
+  messageErrorStyle: {
+    alignSelf: 'center',
+    color: '#FC1055',
+  },
 });
 
 export default class RegisterScreen extends React.Component {
@@ -70,6 +75,7 @@ export default class RegisterScreen extends React.Component {
       phone: '',
     },
     passwordCompared: '',
+    messageError: '',
     isLoading: false,
   };
 
@@ -132,12 +138,11 @@ export default class RegisterScreen extends React.Component {
                 isPassword={false}
                 size={26}
               />
+              <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
 
               <ButtonWithActivityIndicator
                 activityIndicatorStyle={styles.loading}
-                onPress={() => {
-                  this.setState({isLoading: true});
-                }}
+                onPress={() => this._registerAsync()}
                 isLoading={this.state.isLoading}
                 buttonKey="Cadastrar"
                 buttonText="Cadastrar"
@@ -151,7 +156,33 @@ export default class RegisterScreen extends React.Component {
   }
 
   _registerAsync = async () => {
+    this.setState({isLoading: true});
+    const body = {
+      'name': this.state.name,
+      'username': this.state.username,
+      'email': this.state.email,
+      'cpf': this.state.profile.cpf,
+      'password': this.state.password,
+      'birphday': '',
+      'idAdmin': false,
+    }
+
+    api.auth.post('/users', body)
+    .then( res => {
+      console.log(res);
+      if (res.status === 200) {
+        this.setState({ isLoading: false });
+        this.props.navigation.navigate('SignIn');
+      }
+    })
+    .catch(error => {
+      console.log(error.response);
+
+      if (error.response.data.error === 'User already exists') {
+        this.setState({messageError: 'Usuário já existe'});
+        this.setState({ isLoading: false });
+      }
+    })
     // await AsyncStorage.setItem('userToken', '');
-    this.props.navigation.navigate('SignIn');
   };
 }

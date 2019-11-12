@@ -13,6 +13,7 @@ const ButtonWithActivityIndicator = props => (
     ) :
       (
         <TouchableOpacity
+          disabled={props.disabled}
           onPress={() => props.onPress()}
           style={props.buttonStyle}
           activeOpacity={0.7}
@@ -39,6 +40,7 @@ ButtonWithActivityIndicator.propTypes = {
   buttonKey: PropTypes.string.isRequired,
   buttonText: PropTypes.string.isRequired,
   buttonStyle: PropTypes.object.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export default ButtonWithActivityIndicator;

@@ -20,7 +20,9 @@ const HomeStack = createStackNavigator(
 );
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
+  tabBarOptions: {
+    showLabel: false
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={ Platform.OS === 'ios' ? 'ios-home' : 'md-home' }/>
   ),
@@ -36,7 +38,9 @@ const ShoppingListStack = createStackNavigator(
 );
 
 ShoppingListStack.navigationOptions = {
-  tabBarLabel: 'Listas',
+  tabBarOptions: {
+    showLabel: false
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-list' : 'md-list'} />
   ),
@@ -52,7 +56,9 @@ const SettingsStack = createStackNavigator(
 );
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: 'Perfil',
+  tabBarOptions: {
+    showLabel: false
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'md-person' : 'md-person'} />
   ),

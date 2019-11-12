@@ -7,19 +7,21 @@ import SignInScreen from '../screens/SignInScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import QRCodeScannerScreen from '../screens/QRCodeScannerScreen';
-import CreateNewShoppingList from '../screens/CreateNewShoppingList';
+import CreateNewShoppingListScreen from '../screens/CreateNewShoppingListScreen';
 import ShoppingScreen from '../screens/ShoppingScreen';
 
 
 const AuthStack = createStackNavigator({ SignIn: SignInScreen, Register: RegisterScreen });
-const ShoppingStack = createStackNavigator({ Scan: QRCodeScannerScreen, Shopping: ShoppingScreen });
-const ShoppingListStack = createStackNavigator({ CreateShoppingList: CreateNewShoppingList });
+const QrCodeStack = createStackNavigator({ Scan: QRCodeScannerScreen });
+const ShoppingStack = createStackNavigator({ Shopping: ShoppingScreen });
+const ShoppingListStack = createStackNavigator({ CreateShoppingList: CreateNewShoppingListScreen });
 
 export default createAppContainer(
   createSwitchNavigator({
     AuthLoading: AuthLoadingScreen,
     App: MainTabNavigator,
     Auth: AuthStack,
+    Scan: QrCodeStack,
     Shopping: ShoppingStack,
     ShoppingList: ShoppingListStack,
   },
