@@ -34,6 +34,7 @@ async function loadResourcesAsync() {
       // images to load
       require('./src/assets/images/carshier_Logo_cor.png'),
       require('./src/assets/images/carshier_Logo_transparente.png'),
+      require('./src/assets/images/ShoppingCar.gif'),
     ]),
     Font.loadAsync({
       // This is the font that we are using for our tab bar
