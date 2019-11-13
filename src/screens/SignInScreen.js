@@ -93,26 +93,25 @@ export default class SignInScreen extends React.Component {
       'password': this.state.password,
     }
 
-    api.auth.post('/sessions', body)
-    .then( async res => {
-      this.setState({ isLoading: false });
-      if (res.data.token) {
-        await AsyncStorage.setItem('userToken', res.data.token);
-        await AsyncStorage.setItem('userName', res.data.user.name);
-        await AsyncStorage.setItem('userId', res.data.user._id);
-        await AsyncStorage.setItem('userCPF', res.data.user.cpf);
-        await AsyncStorage.setItem('userEmail', res.data.user.email);
+    try {
+      const resAuth = await api.auth.post('/sessions', body);
+      if (resAuth.data.token) {
+        this.setState({ isLoading: false });
+        await AsyncStorage.setItem('userToken', resAuth.data.token);
+        await AsyncStorage.setItem('userName', resAuth.data.user.name);
+        await AsyncStorage.setItem('userId', resAuth.data.user._id);
+        await AsyncStorage.setItem('userCPF', resAuth.data.user.cpf);
+        await AsyncStorage.setItem('userEmail', resAuth.data.user.email);
         this.props.navigation.navigate('App');
       }
-    })
-    .catch(error => {
+    } catch (error) {
       if (error.response.data.error === 'User not found') {
         this.setState({messageError: 'Usuário ou senha inválida'});
       } else if (error.response.data.error === 'Invalid password') {
         this.setState({messageError: 'Senha inválida'});
       }
       this.setState({ isLoading: false });
-    })
+    }
   };
 }
 
