@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   SafeAreaView
 } from 'react-native';
+import dateFormat from 'dateformat';
+import { weekDays, months } from '../constants/Dates';
 
 export default class HomeScreen extends React.Component {
   state = {
@@ -20,18 +22,59 @@ export default class HomeScreen extends React.Component {
 
   async componentDidMount(props) {
     const userId = await AsyncStorage.getItem('userId');
-    api.purchase.get(`/api/userpurchases/${userId}`)
-    .then( async res => {
-      console.log(res)
-    })
-    .catch(error => {
+    const userToken = await AsyncStorage.getItem('userToken');
+
+    header = {
+      headers: {
+        'Authorization': 'Bearer ' + userToken,
+      }
+    }
+
+    try {
+      const resPurchases = await api.purchase.get(`/api/userpurchases/${userId}`, header);
+
+      // Config dateFormat function
+      dateFormat.i18n = {
+        dayNames: weekDays,
+        monthNames: months,
+        timeNames: [
+            'a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'
+        ]
+      }
+      this.createPurchaseList(resPurchases.data);
+    } catch (error) {
       console.log(error.response);
-    })
+      if (error.response.status === 404) {
+        this.setState({purchase: 'Ainda não foi realizada nenhuma compra'});
+      }
+    }
+  }
+
+  createPurchaseList = (resPurchases) => {
     var purchases = [
-      {time: '09:00', title: 'TERÇA-FEIRA, 12 DE AGOSTO', description: 'R$ 37,50  PAGO'},
-      {time: '10:45', title: 'SEGUNDA-FEIRA, 11 DE AGOSTO', description: 'R$ 3,00  PAGO'}
+      // {time: '09:00', title: 'TERÇA-FEIRA, 12 DE AGOSTO', description: 'R$ 37,50  PAGO'},
+      // {time: '10:45', title: 'SEGUNDA-FEIRA, 11 DE AGOSTO', description: 'R$ 3,00  PAGO'}
     ]
-    this.setState({ purchases })
+    resPurchases.map(purchase => {
+      const temp = purchase.date.replace(' ', 'T');
+      const data = new Date(temp);
+
+      const time = dateFormat(data, 'HH:MM');
+      const date = dateFormat(data, 'dddd, d "DE" mmmm');
+      const description = purchase.state === 'COMPLETED' ? 'R$ ' + purchase.value + ' ' + 'Pago' : 'Cancelado'
+
+      const newPurchase = {
+        time: time,
+        title: date,
+        description: description
+      }
+
+      purchases = [
+        ...purchases,
+        newPurchase
+      ]
+      this.setState({ purchases })
+    })
   }
 
   static navigationOptions = {
