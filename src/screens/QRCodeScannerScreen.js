@@ -70,13 +70,21 @@ export default class QRCodeScannerScreen extends React.Component {
   handleQRCodeScanned = async ({ type, data }) => {
     const cartRfid = data;
     this.setState({ scanned: true });
+
+    const userToken = await AsyncStorage.getItem('userToken');
+    header = {
+      headers: {
+        'Authorization': 'Bearer ' + userToken,
+      }
+    }
+
     const userId = await AsyncStorage.getItem('userId');
     const body = {
       'user_id': userId,
       'cart_id': cartRfid,
     }
 
-    api.purchase.post('/api/purchase/', body)
+    api.purchase.post('/api/purchase/', body, header)
     .then( async res => {
       await AsyncStorage.setItem('purchaseId', res.data.id);
       await AsyncStorage.setItem('cartRfid', cartRfid);
