@@ -16,17 +16,15 @@ import * as Permissions from 'expo-permissions';
 import api from '../config/api'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
-export default class BarCodeScannerScreen extends React.Component {
+export default class QRCodeAdminScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     scanned: false,
   };
 
-  // recebe um cart id da leitura de qrcode 
-
   static navigationOptions = ({navigation}) => {
     return {
-      title: 'Escaneie o código de barras',
+      title: 'Escaneie o código QR',
       headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
       headerStyle: {
         backgroundColor: '#fff',
@@ -57,8 +55,8 @@ export default class BarCodeScannerScreen extends React.Component {
       <View
         style={styles.container}>
         <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
-          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.ean13]}
+          onBarCodeScanned={scanned ? undefined : this.handleQRCodeScanned}
+          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
           style={StyleSheet.absoluteFillObject}
         />
 
@@ -69,28 +67,27 @@ export default class BarCodeScannerScreen extends React.Component {
     );
   }
 
-  handleBarCodeScanned = async ({ type, data }) => {
+  handleQRCodeScanned = async ({ type, data }) => {
     const cartRfid = data;
     this.setState({ scanned: true });
-    const cartRfid = await AsyncStorage.getItem('cartRfid');
+    const userId = await AsyncStorage.getItem('userId');
     const body = {
       'user_id': userId,
       'cart_id': cartRfid,
     }
 
-    api.purchase.post('/products_api/barcode', body)
+    api.purchase.get('/api/cart/', body)
     .then( async res => {
-      await AsyncStorage.setItem('purchaseId', res.data.id);
       await AsyncStorage.setItem('cartRfid', cartRfid);
-      alert(`Produto existe`);
-    //   this.props.navigation.navigate('Shopping');
+      alert(`Iniciando verificação de produtos do carrinho`);
+      this.props.navigation.navigate('BarCodeScan');
     })
     .catch(error => {
       console.log(error.response);
-      if (error.response.data.error === 'There is a pending purchase') {
-        alert('Este produto não existe ')
+      if (error.response.data.error === 'CartModel matching query does not exist.') {
+        alert('Este carrinho não está cadastrado ')
       }
-      alert(`Produto ${cartRfid} inválido`);
+      alert(`Carrinho ${cartRfid} inválido`);
     })
   };
 
