@@ -6,35 +6,186 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  ScrollView
 } from 'react-native';
-import { AntDesign, Entypo, FontAwesome, Foundation } from '@expo/vector-icons';
+import api from '../config/api';
+import { AntDesign } from '@expo/vector-icons';
+import { HeaderBackButton } from 'react-navigation';
 
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    name: 'tio joão',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hb1/he1/h00/h00/9452863029278.jpg',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    name: 'camil feijão',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/h71/hd4/h00/h00/9455430107166.jpg',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    name: 'camil arroz',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hfb/h28/h00/h00/9476860543006.jpg',
-  },
-  {
-    id: '58694a0f-3da1-571f-bd96-145571e29d72',
-    name: 'broto legal',
-    image: 'https://static.carrefour.com.br/medias/sys_master/images/images/hef/h6b/h00/h00/9446694060062.jpg',
-  },
-];
+// const categories = [
+//   {
+//     "id": 1,
+//     "name": "Alimentos Básicos"
+//   },
+//   {
+//     "id": 2,
+//     "name": "Mercearia"
+//   },
+// ]
+
+// const subCategories = [
+//   {
+//     "id": 1,
+//     "idcategory": 1,
+//     "name": "Arroz"
+//   },
+//   {
+//     "id": 2,
+//     "idcategory": 1,
+//     "name": "Granel"
+//   },
+//   {
+//     "id": 3,
+//     "idcategory": 2,
+//     "name": "Farinhas e Farofas"
+//   },
+//   {
+//     "id": 4,
+//     "idcategory": 2,
+//     "name": "Massas Instantâneas e Tradicionais"
+//   },
+// ]
+
+// const products = [
+//   {
+//     "id": 1,
+//     "name": "Aveia MEU BIJU 8 Grãos 500g ",
+//     "brand": "Meu Biju",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-fbe3db93869a47ef9a3ba56079503133.png",
+//     "price": 6.19,
+//     "idsubcategory": 1
+//   },
+//   {
+//     "id": 2,
+//     "name": "Ervilha SEARA 300g",
+//     "brand": "Seara",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-d5f73f6622004764aa4e4f1cb4187062.jpeg",
+//     "price": 4.99,
+//     "idsubcategory": 2
+//   },
+//   {
+//     "id": 3,
+//     "name": "Milho de Pipoca NIPPON 500g",
+//     "brand": "Nippon",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-4edc419ff9a349fe85d3241c1dfe03ac.jpeg",
+//     "price": 2.49,
+//     "idsubcategory": 2
+//   },
+//   {
+//     "id": 4,
+//     "name": "Farinha de Trigo LUNAR Premium 1Kg",
+//     "brand": "Lunar",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-8a39151ab91e4e7c94edbef2523d1b32.jpeg",
+//     "price": 3.79,
+//     "idsubcategory": 3
+//   },
+//   {
+//     "id": 5,
+//     "name": "Farinha de Trigo FINNA 1Kg",
+//     "brand": "Finna",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-3f8d0abff53d41e3bacc5f88d7a432cd.jpeg",
+//     "price": 3.49,
+//     "idsubcategory": 3
+//   },
+//   {
+//     "id": 6,
+//     "name": "Macarrão Instantâneo TALHARIM 99g Frango ",
+//     "brand": "Nissin Miojo",
+//     "image": "https://s3-sa-east-1.amazonaws.com/ib.item.image.big/b-90c7bf3b68f748a8a52b8f36eedcc463.png",
+//     "price": 2.29,
+//     "idsubcategory": 4
+//   },
+// ];
 
 export default class CreateNewShoppingListScreen extends React.Component {
   state = {
-    list: {}
+    list: {},
+    productCatalog: {},
+  }
+
+  static navigationOptions = ({navigation}) => {
+    return {
+      title: 'Monte sua lista de compras',
+      headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
+      headerStyle: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 66
+      }
+    };
+  };
+
+  async componentDidMount() {
+    
+
+    let productCatalog = {}     
+
+    productCatalog = await this.setUpCategory(productCatalog);    
+    productCatalog = await this.setUpSubCategory(productCatalog);
+    productCatalog = await this.setUpProducts(productCatalog);
+
+    this.setState({ productCatalog })
+  }
+
+  setUpCategory = async productCatalog => {
+    let categories = {};
+
+    try {
+      res = await api.products.get('/category');
+      categories = res.data;
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+    categories.map((category) => {
+      productCatalog[category.id] = {
+        name: category.name,
+        subcategories: {}
+      }
+    });
+    return productCatalog;
+  }
+
+  setUpSubCategory = async productCatalog => {
+    let subcategories = {};
+    
+    try {
+      res = await api.products.get('/subcategory');
+      subcategories = res.data;
+      
+    } catch (error) {
+      console.log(error);
+    }   
+    
+    subcategories.map(subcategory => {
+      productCatalog[subcategory.idcategory].subcategories[subcategory.id] = {
+        name: subcategory.name,
+        products: []
+      }
+    });
+    return productCatalog;
+  }
+
+  setUpProducts = async productCatalog => {
+    let products = {};
+
+    try {
+      res = await api.products.get('/product');
+      products = res.data;
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+    for (let category in productCatalog) {
+      products.map(product => {
+        if(productCatalog[category].subcategories[product.idsubcategory]) {
+          productCatalog[category].subcategories[product.idsubcategory].products.push(product)
+        }
+      });
+    }
+    return productCatalog;
   }
 
   addToList(item) {
@@ -104,20 +255,35 @@ export default class CreateNewShoppingListScreen extends React.Component {
   }
 
   render(){
-    return (
-      <View style={{flex: 1}}>
-      <View>
-      <Text style={styles.text}>Categoria</Text>
-      <FlatList
-      keyExtractor={item => item.id}
+    const productCatalog = []
+    
+    
+    for (var category of Object.values(this.state.productCatalog)) {
+      productCatalog.push(<Text style={styles.categoryName}>{category.name}</Text>)
+      
+      for (var subCategory of Object.values(category.subcategories)) {
+        productCatalog.push(
+          <View style={{paddingLeft: 0}}>
+            <Text style={styles.subCategoryName}>{subCategory.name}</Text>
+            <FlatList
+            style={{paddingHorizontal: 5, paddingVertical: 5}}
+            keyExtractor={item => item.id}
+            horizontal
+            ItemSeparatorComponent={() => <View style={{width: 30}} />}
+            renderItem={({item}) => this._renderItem(item)}
+            data={subCategory.products}
+            />
+          </View>
+        );
+      }
+    }
 
-      horizontal
-      ItemSeparatorComponent={() => <View style={{width: 30}} />}
-      renderItem={({item}) => this._renderItem(item)}
-      data={DATA}
-      />
-      </View>
-      </View>
+    return (
+      <ScrollView style={{flex: 1}}>
+        {
+          productCatalog
+        }
+      </ScrollView>
     )
   }
 }
@@ -129,6 +295,19 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'black',
+  },
+  categoryName: {
+    flex: 1,
+    fontSize: 24,
+    backgroundColor: '#FC1055',
+    paddingLeft: 5
+  },
+  subCategoryName: {
+    flex: 1,
+    fontSize: 18,
+    paddingLeft: 10,
+    borderTopColor: 'black',
+    borderTopWidth: 1,
   },
   buttonsView: {
     flexDirection: 'row',
