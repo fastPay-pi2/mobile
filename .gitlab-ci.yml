@@ -11,7 +11,10 @@ before_script:
 expo-deployments:
   stage: deploy
   script:
-    - apk add --no-cache bash
+    - apk add --no-cache --virtual .gyp \
+        python \
+        make \
+        g++ \
     - echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
     - npx expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD --non-interactive
     - npx expo publish --non-interactive
