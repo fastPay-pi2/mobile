@@ -16,9 +16,6 @@
       "image": "./src/assets/images/carshier_Logo_cor.png",
       "backgroundColor": "#fad3b0"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
