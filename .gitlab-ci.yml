@@ -6,11 +6,11 @@ cache:
 stages:
   - test
   - deploy
-before_script:
-  - npm i
 expo-deployments:
   stage: deploy
   script:
-    - apk add --no-cache bash
+    - apk add --no-cache --virtual .gyp python make g++
+    - npm install
     - npx expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD
     - npx expo publish --non-interactive
+    - apk del .gyp
