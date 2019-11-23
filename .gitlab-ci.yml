@@ -3,14 +3,17 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - ~/.npm
+    - .jest
 stages:
-  - test
   - deploy
+before_script:
+  - npm ci
 expo-deployments:
   stage: deploy
   script:
-    - apk add --no-cache --virtual .gyp python make g++ bash
-    - npm install
-    - npx expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD
+    - apk add --no-cache bash
+    - echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+    - npx expo login -u ${EXPO_USERNAME} -p ${EXPO_PASSWORD} --non-interactive
     - npx expo publish --non-interactive
-    - apk del .gyp
+  only:
+    - master
