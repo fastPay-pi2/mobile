@@ -101,6 +101,9 @@ export default class SignInScreen extends React.Component {
         await AsyncStorage.setItem('userId', res.data.user._id);
         await AsyncStorage.setItem('userCPF', res.data.user.cpf);
         await AsyncStorage.setItem('userEmail', res.data.user.email);
+        if (res.data.user.isAdmin){
+          this.props.navigation.navigate('BarCodeScan');  
+        }
         this.props.navigation.navigate('App');
       }
     })
