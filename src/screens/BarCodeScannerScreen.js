@@ -20,6 +20,8 @@ export default class BarCodeScannerScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     scanned: false,
+    products: [],
+    cart: ''
   };
 
   // recebe um cart id da leitura de qrcode 
@@ -71,13 +73,19 @@ export default class BarCodeScannerScreen extends React.Component {
 
   handleBarCodeScanned = async ({ type, data }) => {
     const cartRfid = data;
-    // alert(data)
+    if (data.indexOf('-')){
+      this.setState({ cart: data });
+      alert(`Carrinho ${data} associado`)
+    } else {
+      this.state.products.push(data)
+      alert(`Produto ${data} adicionado`)
+    }
     this.setState({ scanned: true });
     // const cartRfid = await AsyncStorage.getItem('cartRfid');
-    const body = {
-      'user_id': userId,
-      'cart_id': cartRfid,
-    }
+    // const body = {
+    //   'user_id': userId,
+    //   'cart_id': cartRfid,
+    // }
 
     // api.purchase.post('/products_api/barcode', body)
     // .then( async res => {
