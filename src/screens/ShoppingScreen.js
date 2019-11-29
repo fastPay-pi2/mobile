@@ -5,7 +5,7 @@ import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
-import { Constants, WebBrowser } from 'expo';
+import { Constants, Linking as LinkingExpo } from 'expo';
 import {x_picpay_token, x_seller_token} from '../config/picPayToken';
 import api from '../config/api'
 
@@ -30,7 +30,7 @@ export default class ShoppingScreen extends React.Component {
   },2000);
 
   timerStatus = setInterval( () => {
-    if (this.state.painding) {
+    if (!this.state.shopping) {
       console.log('status');
       this.verifyStatus();
     }
@@ -59,6 +59,22 @@ export default class ShoppingScreen extends React.Component {
     }
   };
 
+  showPaidConfirmation = () => {
+    Alert.alert(
+      'Compra Finalizada Com Sucesso',
+      'Sua compra foi paga e finalizada',
+      [
+        {
+          text: 'OK',
+          onPress: async () => {
+          },
+          style: 'default'
+        },
+      ],
+      {cancelable: false},
+    );
+  }
+
   verifyStatus = async () => {
     header = {
       headers: {
@@ -69,27 +85,22 @@ export default class ShoppingScreen extends React.Component {
     const purchaseId = await AsyncStorage.getItem('purchaseId');
 
     axios.get('https://appws.picpay.com/ecommerce/public/payments/'+ purchaseId + '/status', header)
-    .then(res => {
+    .then( async res => {
       console.log(res.data.status);
       if (res.data.status === 'paid') {
-        Alert.alert(
-          'Compra Finalizada Com Sucesso',
-          'Sua compra foi paga e finalizada',
-          [
-            {
-              text: 'OK',
-              onPress: async () => {
-                await this.changePurchaseStatus('COMPLETED');
-              },
-              style: 'default'
-            },
-          ],
-          {cancelable: false},
-        );
+        const res = await this.changePurchaseStatus('COMPLETED');
+        if (res) {
+          await AsyncStorage.removeItem('purchaseId');
+          await AsyncStorage.removeItem('cartRfid');
+          clearInterval(this.timerPurchase);
+          clearInterval(this.timerStatus);
+          this.props.navigation.navigate('Home');
+          this.showPaidConfirmation();
+        }
       }
     })
     .catch(error => {
-      console.log(error.response);
+      console.log(error.response.status);
     })
   }
 
@@ -104,11 +115,13 @@ export default class ShoppingScreen extends React.Component {
     const name = await AsyncStorage.getItem('userName');
     const cpf =  await AsyncStorage.getItem('userCPF');
     const email = await AsyncStorage.getItem('userEmail');
-
+    console.log(LinkingExpo.makeUrl());
     body = {
       'referenceId': purchaseId,
       'callbackUrl': 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
-      'value': this.state.totalPrice,
+      'returnUrl': LinkingExpo.makeUrl(),
+      // 'value': this.state.totalPrice,
+      'value': 0.01,
       'buyer': {
         'firstName': 'Lucas',
         'lastName': 'Penido',
@@ -117,6 +130,7 @@ export default class ShoppingScreen extends React.Component {
         'phone': '+55 61 993458-3238'
       }
     }
+    console.log(body);
 
     axios.post('https://appws.picpay.com/ecommerce/public/payments', body, header)
     .then(res => {
@@ -134,22 +148,39 @@ export default class ShoppingScreen extends React.Component {
   }
 
   async changePurchaseStatus(status) {
+    const userToken = await AsyncStorage.getItem('userToken');
+    header = {
+      headers: {
+        'Authorization': 'Bearer ' + userToken,
+      }
+    }
+
     const userId = await AsyncStorage.getItem('userId');
     body = {
       'new_state': status,
     }
-    api.purchase.put('/api/purchase/' + userId, body)
-    .then( async res => {
+
+    try {
+      await api.purchase.put('/api/purchase/' + userId, body, header);
+      return true;
+    } catch (error) {
+      console.log(error.response.data.error);
+      return false;
+    }
+  }
+
+  cancelPurchase = async() => {
+    const res = await this.changePurchaseStatus('ABORTED');
+    if (res) {
       await AsyncStorage.removeItem('purchaseId');
       await AsyncStorage.removeItem('cartRfid');
       alert('Compra cancelada');
       clearInterval(this.timerPurchase);
       clearInterval(this.timerStatus);
       this.props.navigation.navigate('Home');
-    })
-    .catch(error => {
-      console.log(error.response.data.error);
-    })
+    } else {
+      alert('Erro ao cancelar compra!');
+    }
   }
 
   cancelPurchaseConfirmation = () => {
@@ -160,7 +191,7 @@ export default class ShoppingScreen extends React.Component {
         {
           text: 'Sim',
           onPress: async () => {
-            await this.changePurchaseStatus('ABORTED');
+            await this.cancelPurchase();
           },
           style: 'default'
         },
@@ -176,8 +207,14 @@ export default class ShoppingScreen extends React.Component {
   updatePurchase = async () => {
     this.setState({refreshing: true});
     const userId = await AsyncStorage.getItem('userId');
-    console.log(userId);
-    api.purchase.get('/api/userpurchases/' + userId)
+    const userToken = await AsyncStorage.getItem('userToken');
+    header = {
+      headers: {
+        'Authorization': 'Bearer ' + userToken,
+      }
+    }
+
+    api.purchase.get('/api/userpurchases/' + userId, header)
     .then(res => {
       const currentPurchase = res.data.find(element => {
         return element.state === 'ONGOING' || element.state === 'PAYING';
@@ -213,20 +250,16 @@ export default class ShoppingScreen extends React.Component {
   }
 
   render() {
-    // setTimeout(() => {console.log('hi'); }, 5000);
     return (
       <View style={styles.container}>
         {
           this.state.shopping ?
           (
-            // <ScrollView>
-              // <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.updatePurchase()}/>
-              <View style={styles.shopping}>
-                <Image source={require('../assets/images/ShoppingCar.gif')}
-                  style={{width: 150, height: 150, }}/>
-                <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
-              </View>
-            // </ScrollView>
+            <View style={styles.shopping}>
+              <Image source={require('../assets/images/ShoppingCar.gif')}
+                style={{width: 150, height: 150, }}/>
+              <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
+            </View>
           ) : (
             <FlatList
               style={styles.productsList}

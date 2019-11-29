@@ -71,6 +71,7 @@ export default class BarCodeScannerScreen extends React.Component {
 
   handleBarCodeScanned = async ({ type, data }) => {
     const cartRfid = data;
+    // alert(data)
     this.setState({ scanned: true });
     // const cartRfid = await AsyncStorage.getItem('cartRfid');
     const body = {
@@ -109,7 +110,7 @@ export default class BarCodeScannerScreen extends React.Component {
       },
       {
         text: 'Cancelar',
-        onPress: () => this.props.navigation.navigate('Home'),
+        // onPress: () => this.props.navigation.navigate('Home'),
         style: 'cancel'
       }
     ],
