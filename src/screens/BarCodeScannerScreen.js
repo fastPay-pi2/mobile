@@ -81,28 +81,30 @@ export default class BarCodeScannerScreen extends React.Component {
       alert(`Produto ${data} adicionado`)
     }
     this.setState({ scanned: true });
-    // const cartRfid = await AsyncStorage.getItem('cartRfid');
-    // const body = {
-    //   'user_id': userId,
-    //   'cart_id': cartRfid,
-    // }
-
-    // api.purchase.post('/products_api/barcode', body)
-    // .then( async res => {
-    //   await AsyncStorage.setItem('purchaseId', res.data.id);
-    //   await AsyncStorage.setItem('cartRfid', cartRfid);
-    //   alert(`Produto existe`);
-    // //   this.props.navigation.navigate('Shopping');
-    // })
-    // .catch(error => {
-    //   console.log(error.response);
-    //   if (error.response.data.error === 'There is a pending purchase') {
-    //     alert('Este produto não existe ')
-    //   }
-    //   alert(`Produto ${cartRfid} inválido`);
-    // })
   };
 
+  postPurchaseValidation() {
+    const body = {
+        'cart': this.state.cart,
+        'items': this.state.products,
+      }
+
+    api.purchase.post('/api/purchasevalidation/', body)
+    .then( async res => {
+      // await AsyncStorage.setItem('purchaseId', res.data.id);
+      // await AsyncStorage.setItem('cartRfid', cartRfid);
+      alert(res.data);
+    })
+    .catch(error => {
+      console.log(error.response);
+      if (error.response.data.error === 'There is a pending purchase') {
+        alert('Este produto não existe ')
+      }
+      alert(`Produto ${cartRfid} inválido`);
+    })
+  }
+
+  // TODO - logout user if user clicks in 'cancelar'
   showNoPermissionAlert() {
     Alert.alert(
     'Sem acesso à câmera',
