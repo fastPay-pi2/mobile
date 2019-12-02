@@ -52,7 +52,10 @@ export default class ConfigScreen extends React.Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity activeOpacity={0.5} style={styles.contentContainer}>
+        <TouchableOpacity 
+         onPress={() => {this.props.navigation.navigate('Profile')}}
+         activeOpacity={0.5}
+         style={styles.contentContainer}>
           <MaterialCommunityIcons
             style={styles.iconStyle}
             name='account-settings'
@@ -62,7 +65,10 @@ export default class ConfigScreen extends React.Component {
           <Text style={styles.configStyle}>Configurações de Conta</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity activeOpacity={0.5} style={styles.contentContainer}>
+        <TouchableOpacity
+          onPress={() => {this.props.navigation.navigate('About')}}
+          activeOpacity={0.5}
+          style={styles.contentContainer}>
           <MaterialCommunityIcons
             style={styles.iconStyle}
             name='information'

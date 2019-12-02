@@ -12,6 +12,8 @@ import QRCodeAdminScreen from '../screens/BarCodeScannerScreen';
 
 import CreateNewShoppingListScreen from '../screens/CreateNewShoppingListScreen';
 import ShoppingScreen from '../screens/ShoppingScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import AboutScreen from '../screens/AboutScreen';
 
 
 const AuthStack = createStackNavigator({ SignIn: SignInScreen, Register: RegisterScreen });
@@ -21,6 +23,8 @@ const QrCodeAdmintack = createStackNavigator({ Scan: QRCodeAdminScreen });
 const BarCodeStack = createStackNavigator({ Scan: BarCodeScannerScreen });
 const ShoppingStack = createStackNavigator({ Shopping: ShoppingScreen });
 const ShoppingListStack = createStackNavigator({ CreateShoppingList: CreateNewShoppingListScreen });
+const ProfileStack =  createStackNavigator({ Profile: ProfileScreen })
+const AboutStack =  createStackNavigator({ About: AboutScreen })
 
 export default createAppContainer(
   createSwitchNavigator({
@@ -32,6 +36,8 @@ export default createAppContainer(
     Shopping: ShoppingStack,
     ShoppingList: ShoppingListStack,
     BarCodeScan: BarCodeStack,
+    Profile: ProfileStack,
+    About: AboutStack
   },
   {
     initialRouteName: 'AuthLoading',
