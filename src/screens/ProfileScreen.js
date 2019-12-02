@@ -13,6 +13,8 @@ import NameField from '../components/NameField'
 import UsernameField from '../components/UsernameField'
 import EmailField from '../components/EmailField'
 import PasswordField from '../components/PasswordField'
+import { HeaderBackButton } from 'react-navigation';
+
 
 export default class ProfileScreen extends React.Component {
   state = {
@@ -28,17 +30,20 @@ export default class ProfileScreen extends React.Component {
     isLoading: false,
   }
 
-  static navigationOptions = {
-    title: 'Perfil',
-    headerStyle: {
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      height: 66
-    },
-    headerTitleStyle: { 
-      textAlign:"center", 
-      flex:1 
-    }
+  static navigationOptions = ({navigation}) => {
+    return {
+        title: 'Perfil',
+        headerLeft: <HeaderBackButton onPress={() => navigation.navigate('Config')} />,
+        headerStyle: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 66
+        },
+        headerTitleStyle: { 
+        textAlign:"center", 
+        flex:0.8 
+        }
+    };
   };
 
   async componentDidMount() {

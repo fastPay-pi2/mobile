@@ -31,7 +31,7 @@ export default class AboutScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
         title: 'About',
-        headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
+        headerLeft: <HeaderBackButton onPress={() => navigation.navigate('Config')} />,
         headerStyle: {
         backgroundColor: '#fff',
         borderRadius: 10,
@@ -39,7 +39,7 @@ export default class AboutScreen extends React.Component {
         },
         headerTitleStyle: { 
         textAlign:"center", 
-        flex:1 
+        flex:0.8
         }
     };
   };
