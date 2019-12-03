@@ -5,15 +5,15 @@ import {
   Button,
   StatusBar,
   StyleSheet,
-  View,
+  View
 } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center'
+  }
 });
 
 export default class AuthLoadingScreen extends React.Component {
@@ -26,10 +26,19 @@ export default class AuthLoadingScreen extends React.Component {
   _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const purchaseId = await AsyncStorage.getItem('purchaseId');
+    const isAdmin = JSON.parse(await AsyncStorage.getItem('isAdmin'));
 
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.
-    this.props.navigation.navigate(!userToken ? 'Auth' : purchaseId ? 'Shopping' : 'App');
+    this.props.navigation.navigate(
+      !userToken
+        ? 'Auth'
+        : isAdmin
+        ? 'BarCodeScan'
+        : purchaseId
+        ? 'Shopping'
+        : 'App'
+    );
   };
 
   // Render any loading content that you like here
