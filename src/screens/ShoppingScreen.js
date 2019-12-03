@@ -1,13 +1,26 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, Image, Text, Linking, FlatList, Dimensions, AsyncStorage, Alert, RefreshControl } from 'react-native';
-import ShoppingList from '../components/ShoppingList'
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Button,
+  Image,
+  Text,
+  Linking,
+  FlatList,
+  Dimensions,
+  AsyncStorage,
+  Alert,
+  RefreshControl
+} from 'react-native';
+import ShoppingList from '../components/ShoppingList';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
 import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 import axios from 'axios';
 import { Constants, Linking as LinkingExpo } from 'expo';
-import {x_picpay_token, x_seller_token} from '../config/picPayToken';
-import api from '../config/api'
+import { x_picpay_token, x_seller_token } from '../config/picPayToken';
+import api from '../config/api';
 
 export default class ShoppingScreen extends React.Component {
   state = {
@@ -17,26 +30,28 @@ export default class ShoppingScreen extends React.Component {
     products: [],
     totalPrice: 0,
     painding: false,
-    paid: false,
+    paid: false
   };
 
   componentDidMount() {
-    this.props.navigation.setParams({ cancelPurchaseConfirmation: this.cancelPurchaseConfirmation.bind(this) });
+    this.props.navigation.setParams({
+      cancelPurchaseConfirmation: this.cancelPurchaseConfirmation.bind(this)
+    });
   }
 
-  timerPurchase = setInterval( () => {
+  timerPurchase = setInterval(() => {
     console.log('purchase');
     this.updatePurchase();
-  },2000);
+  }, 2000);
 
-  timerStatus = setInterval( () => {
+  timerStatus = setInterval(() => {
     if (!this.state.shopping) {
       console.log('status');
       this.verifyStatus();
     }
-  },2000);
+  }, 2000);
 
-  static navigationOptions = ({navigation}) => {
+  static navigationOptions = ({ navigation }) => {
     return {
       title: 'Carrinho',
       headerStyle: {
@@ -45,18 +60,18 @@ export default class ShoppingScreen extends React.Component {
         height: 66
       },
       headerTitleStyle: {
-        textAlign:'center',
-        flex:1
+        textAlign: 'center',
+        flex: 1
       },
       headerRight: (
         <MaterialCommunityIcons
-          style={{paddingRight: 25}}
-          name='cart-off'
+          style={{ paddingRight: 25 }}
+          name="cart-off"
           size={26}
           onPress={navigation.getParam('cancelPurchaseConfirmation')}
-          />
+        />
       )
-    }
+    };
   };
 
   showPaidConfirmation = () => {
@@ -66,99 +81,103 @@ export default class ShoppingScreen extends React.Component {
       [
         {
           text: 'OK',
-          onPress: async () => {
-          },
+          onPress: async () => {},
           style: 'default'
-        },
+        }
       ],
-      {cancelable: false},
+      { cancelable: false }
     );
-  }
+  };
 
   verifyStatus = async () => {
     header = {
       headers: {
-        'x-picpay-token': x_picpay_token,
+        'x-picpay-token': x_picpay_token
       }
-    }
+    };
 
     const purchaseId = await AsyncStorage.getItem('purchaseId');
 
-    axios.get('https://appws.picpay.com/ecommerce/public/payments/'+ purchaseId + '/status', header)
-    .then( async res => {
-      console.log(res.data.status);
-      if (res.data.status === 'paid') {
-        const res = await this.changePurchaseStatus('COMPLETED');
-        if (res) {
-          await AsyncStorage.removeItem('purchaseId');
-          await AsyncStorage.removeItem('cartRfid');
-          clearInterval(this.timerPurchase);
-          clearInterval(this.timerStatus);
-          this.props.navigation.navigate('Home');
-          this.showPaidConfirmation();
+    axios
+      .get(
+        'https://appws.picpay.com/ecommerce/public/payments/' +
+          purchaseId +
+          '/status',
+        header
+      )
+      .then(async res => {
+        console.log(res.data.status);
+        if (res.data.status === 'paid') {
+          const res = await this.changePurchaseStatus('COMPLETED');
+          if (res) {
+            await AsyncStorage.removeItem('purchaseId');
+            await AsyncStorage.removeItem('cartRfid');
+            clearInterval(this.timerPurchase);
+            clearInterval(this.timerStatus);
+            this.props.navigation.navigate('Home');
+            this.showPaidConfirmation();
+          }
         }
-      }
-    })
-    .catch(error => {
-      console.log(error.response.status);
-    })
-  }
+      })
+      .catch(error => {
+        console.log(error.response.status);
+      });
+  };
 
   buy = async () => {
     header = {
       headers: {
-        'x-picpay-token': x_picpay_token,
+        'x-picpay-token': x_picpay_token
       }
-    }
+    };
 
     const purchaseId = await AsyncStorage.getItem('purchaseId');
     const name = await AsyncStorage.getItem('userName');
-    const cpf =  await AsyncStorage.getItem('userCPF');
+    const cpf = await AsyncStorage.getItem('userCPF');
     const email = await AsyncStorage.getItem('userEmail');
     console.log(LinkingExpo.makeUrl());
     body = {
-      'referenceId': purchaseId,
-      'callbackUrl': 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
-      'returnUrl': LinkingExpo.makeUrl(),
+      referenceId: purchaseId,
+      callbackUrl: 'https://webhook.site/213b4e3a-b9c4-429e-8cdf-06db590bc3ac',
+      returnUrl: LinkingExpo.makeUrl(),
       // 'value': this.state.totalPrice,
-      'value': 0.01,
-      'buyer': {
-        'firstName': 'Lucas',
-        'lastName': 'Penido',
-        'document': cpf,
-        'email': email,
-        'phone': '+55 61 993458-3238'
+      value: 0.01,
+      buyer: {
+        firstName: 'Lucas',
+        lastName: 'Penido',
+        document: cpf,
+        email: email,
+        phone: '+55 61 993458-3238'
       }
-    }
+    };
     console.log(body);
 
-    axios.post('https://appws.picpay.com/ecommerce/public/payments', body, header)
-    .then(res => {
-      console.log(res);
-      console.log(res.data.paymentUrl);
-      clearInterval(this.timerPurchase);
-      this.setState({ painding: true });
-      Linking.openURL(res.data.paymentUrl);
-    })
-    .catch(error => {
-      console.log(error.response);
-
-    })
-
-  }
+    axios
+      .post('https://appws.picpay.com/ecommerce/public/payments', body, header)
+      .then(res => {
+        console.log(res);
+        console.log(res.data.paymentUrl);
+        clearInterval(this.timerPurchase);
+        this.setState({ painding: true });
+        Linking.openURL(res.data.paymentUrl);
+      })
+      .catch(error => {
+        console.log(error.response);
+      });
+  };
 
   async changePurchaseStatus(status) {
     const userToken = await AsyncStorage.getItem('userToken');
     header = {
       headers: {
-        'Authorization': 'Bearer ' + userToken,
+        Authorization: 'Bearer ' + userToken
       }
-    }
+    };
 
     const userId = await AsyncStorage.getItem('userId');
     body = {
-      'new_state': status,
-    }
+      new_state: status
+    };
 
     try {
       await api.purchase.put('/api/purchase/' + userId, body, header);
@@ -169,7 +188,7 @@ export default class ShoppingScreen extends React.Component {
     }
   }
 
-  cancelPurchase = async() => {
+  cancelPurchase = async () => {
     const res = await this.changePurchaseStatus('ABORTED');
     if (res) {
       await AsyncStorage.removeItem('purchaseId');
@@ -181,7 +200,7 @@ export default class ShoppingScreen extends React.Component {
     } else {
       alert('Erro ao cancelar compra!');
     }
-  }
+  };
 
   cancelPurchaseConfirmation = () => {
     Alert.alert(
@@ -200,84 +219,91 @@ export default class ShoppingScreen extends React.Component {
           style: 'cancel'
         }
       ],
-      {cancelable: false},
+      { cancelable: false }
     );
-  }
+  };
 
   updatePurchase = async () => {
-    this.setState({refreshing: true});
+    this.setState({ refreshing: true });
     const userId = await AsyncStorage.getItem('userId');
     const userToken = await AsyncStorage.getItem('userToken');
     header = {
       headers: {
-        'Authorization': 'Bearer ' + userToken,
+        Authorization: 'Bearer ' + userToken
       }
-    }
+    };
 
-    api.purchase.get('/api/userpurchases/' + userId, header)
-    .then(res => {
-      const currentPurchase = res.data.find(element => {
-        return element.state === 'ONGOING' || element.state === 'PAYING';
+    api.purchase
+      .get('/api/userpurchases/' + userId, header)
+      .then(res => {
+        const currentPurchase = res.data.find(element => {
+          return element.state === 'ONGOING' || element.state === 'PAYING';
+        });
+        this.setState({ refreshing: false });
+
+        if (currentPurchase.state === 'PAYING') {
+          this.setState({ totalPrice: currentPurchase.value });
+          this.setState({ products: currentPurchase.purchased_products });
+          this.setState({ shopping: false });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({ refreshing: false });
+        alert('Erro ao atualizar compras');
       });
-      this.setState({refreshing: false});
-
-      if (currentPurchase.state === 'PAYING') {
-        this.setState({ totalPrice: currentPurchase.value });
-        this.setState({ products: currentPurchase.purchased_products });
-        this.setState({ shopping: false });
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      this.setState({refreshing: false});
-      alert('Erro ao atualizar compras');
-    })
-  }
+  };
 
   _renderProduct(product) {
-    return(
+    return (
       <View style={styles.productView}>
-        <Image style={styles.productImage} source={{uri: product.productimage}}/>
+        <Image
+          style={styles.productImage}
+          source={{ uri: product.productimage }}
+        />
         <View style={styles.productInformation}>
           <Text style={styles.productName}>{product.productname}</Text>
-          <View style={{flex:1, alignItems:'center'}}>
-            <Text style={{fontSize: 20, paddingBottom: 5}}>R$ {product.productprice}</Text>
-            <Text style={{fontSize: 14}}>{product.quantity} un</Text>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ fontSize: 20, paddingBottom: 5 }}>
+              R$ {product.productprice}
+            </Text>
+            <Text style={{ fontSize: 14 }}>{product.quantity} un</Text>
           </View>
         </View>
       </View>
-    )
+    );
   }
 
   render() {
     return (
       <View style={styles.container}>
-        {
-          this.state.shopping ?
-          (
-            <View style={styles.shopping}>
-              <Image source={require('../assets/images/ShoppingCar.gif')}
-                style={{width: 150, height: 150, }}/>
-              <Text style={{fontFamily: 'work-sans-semiBold',}}>Você está em processo de compra. {'\n'}Assim que você passar pelo portal de compras os seus produtos aparecerão aqui para que você possa verificá-los e assim prosseguir com o pagamento.</Text>
-            </View>
-          ) : (
-            <FlatList
-              style={styles.productsList}
-              keyExtractor={item => item.productid.toString()}
-              renderItem={({item}) => this._renderProduct(item)}
-              data={this.state.products}
-              />
-          )
-        }
+        {this.state.shopping ? (
+          <View style={styles.shopping}>
+            <Image
+              source={require('../assets/images/ShoppingCar.gif')}
+              style={{ width: 150, height: 150 }}
+            />
+            <Text style={{ fontFamily: 'work-sans-semiBold' }}>
+              Você está em processo de compra. {'\n'}Assim que você passar pelo
+              portal de compras os seus produtos aparecerão aqui para que você
+              possa verificá-los e assim prosseguir com o pagamento!
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            style={styles.productsList}
+            keyExtractor={item => item.productid.toString()}
+            renderItem={({ item }) => this._renderProduct(item)}
+            data={this.state.products}
+          />
+        )}
 
         <View style={styles.footer}>
-          {
-            this.state.shopping ? (
-              null
-            ) : (
-              <Text style={{alignSelf: 'center', fontSize: 20}}>R$ {this.state.totalPrice}</Text>
-            )
-          }
+          {this.state.shopping ? null : (
+            <Text style={{ alignSelf: 'center', fontSize: 20 }}>
+              R$ {this.state.totalPrice}
+            </Text>
+          )}
           <ButtonWithActivityIndicator
             disabled={this.state.shopping}
             activityIndicatorStyle={styles.loading}
@@ -285,15 +311,14 @@ export default class ShoppingScreen extends React.Component {
               this.buy();
             }}
             isLoading={this.state.isLoading}
-            buttonKey='Pagar'
-            buttonText='Pagar'
+            buttonKey="Pagar"
+            buttonText="Pagar"
             buttonStyle={styles.buttonPay}
-            />
-
+          />
         </View>
       </View>
     );
-  };
+  }
 }
 
 const { height } = Dimensions.get('window');
@@ -308,50 +333,49 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    shadowOffset : { width: 0, height: 13},
+    shadowOffset: { width: 0, height: 13 }
   },
   container: {
-    flex: 1,
+    flex: 1
   },
   shopping: {
     flex: 1,
     alignItems: 'center',
     margin: 50,
-    padding: 10,
+    padding: 10
   },
   productsList: {
-    flex: 1,
+    flex: 1
   },
   footer: {
-    height: height * 14/100,
+    height: (height * 14) / 100,
     borderTopColor: '#A9A9A9',
     borderTopWidth: 0.5,
     backgroundColor: '#f2f2f2',
     justifyContent: 'space-around',
     alignItems: 'center',
-    flexDirection: 'row',
-
+    flexDirection: 'row'
   },
   loading: {
     marginTop: 50,
-    paddingVertical: 13,
+    paddingVertical: 13
   },
   productView: {
     flex: 1,
     flexDirection: 'row',
     borderBottomWidth: 0.5,
     padding: 10,
-    borderBottomColor: '#A9A9A9',
+    borderBottomColor: '#A9A9A9'
   },
   productImage: {
     flex: 1,
-    height: 100,
+    height: 100
   },
   productInformation: {
     flex: 2.8,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
+    padding: 5
   },
   productName: {
     fontSize: 20,
