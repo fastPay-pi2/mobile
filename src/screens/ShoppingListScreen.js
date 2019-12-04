@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, SafeAreaView, TouchableOpacity, Text, AsyncStorage } from 'react-native';
 import ShoppingList from '../components/ShoppingList'
 import { AntDesign } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
@@ -7,6 +7,7 @@ import { HeaderBackButton } from 'react-navigation';
 export default class ShoppingListScreen extends React.Component {
   state = {
     lists: ['COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA', 'COMPRAS DO MÊS', 'COMPRAS DO MÊS 2', 'FINAL DE SEMANA'],
+    purchaseLists: [],
   };
 
   static navigationOptions = ({navigation}) => {
@@ -35,11 +36,18 @@ export default class ShoppingListScreen extends React.Component {
           style={styles.button}
         >
           <Text style={styles.buttonText}>
-            {list.toUpperCase()}
+            {list.name.toUpperCase()}
           </Text>
         </TouchableOpacity>
       </View>
     )
+  }
+
+  async componentDidMount() {
+    var temp = await AsyncStorage.getItem('purchaseLists');
+    purchaseLists = JSON.parse(temp);
+    this.setState({ purchaseLists })
+    // console.log(purchaseLists[0].name)
   }
 
   render() {
@@ -48,7 +56,7 @@ export default class ShoppingListScreen extends React.Component {
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
-          {this.state.lists.map(this.printLists)}
+          {this.state.purchaseLists.map(this.printLists)}
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('CreateShoppingList')}}
             style={styles.buttonAdd}>
