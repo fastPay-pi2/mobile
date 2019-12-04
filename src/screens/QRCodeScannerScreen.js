@@ -94,7 +94,7 @@ export default class QRCodeScannerScreen extends React.Component {
       var currentPurchaseLists = await AsyncStorage.getItem('currentPurchaseLists');
       alert(`Compra cadastrada`);
       if(currentPurchaseLists){
-        this.props.navigation.navigate('Shopping');
+        this.props.navigation.navigate('ShoppingWithList');
       }
       this.props.navigation.navigate('Shopping');
     })

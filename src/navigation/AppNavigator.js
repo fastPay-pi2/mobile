@@ -3,6 +3,7 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import MainTabNavigator from './MainTabNavigator';
+import ShoppingTabNavigator from './ShoppingTabNavigator';
 import SignInScreen from '../screens/SignInScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
@@ -20,6 +21,7 @@ export default createAppContainer(
   createSwitchNavigator({
     AuthLoading: AuthLoadingScreen,
     App: MainTabNavigator,
+    ShoppingWithList: ShoppingTabNavigator,
     Auth: AuthStack,
     Scan: QrCodeStack,
     Shopping: ShoppingStack,
