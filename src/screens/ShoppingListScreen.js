@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Button, SafeAreaView, TouchableOpacity, Text, AsyncStorage } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, SafeAreaView, TouchableOpacity, Text, AsyncStorage, Alert } from 'react-native';
 import ShoppingList from '../components/ShoppingList'
 import { AntDesign } from '@expo/vector-icons';
 import { HeaderBackButton } from 'react-navigation';
@@ -26,13 +26,46 @@ export default class ShoppingListScreen extends React.Component {
     }
   };
 
+  async startPurchase(l) {
+    var msg = '';
+    for (var i in l){
+      if(l[i].name){
+        if(msg != ''){
+          msg = msg + ', ';
+        }
+        msg = msg + l[i].name;
+      }
+    }
+    Alert.alert(l.name, msg,
+      [
+        {
+          text: 'Iniciar Compra',
+          onPress: async () => {
+            
+            await AsyncStorage.setItem(
+              'currentPurchaseLists',
+              JSON.stringify(l)
+            );
+            
+            this.props.navigation.navigate('Scan');
+          },
+          style: 'default'
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        }
+      ]
+    );
+  }
+
   printLists = (list, i) => {
     return(
       <View
         key={i}
       >
         <TouchableOpacity
-          onPress={() => {/*visualizar lista*/}}
+          onPress={() => {this.startPurchase(list)}}
           style={styles.button}
         >
           <Text style={styles.buttonText}>
@@ -43,11 +76,11 @@ export default class ShoppingListScreen extends React.Component {
     )
   }
 
+
   async componentDidMount() {
     var temp = await AsyncStorage.getItem('purchaseLists');
     purchaseLists = JSON.parse(temp);
     this.setState({ purchaseLists })
-    // console.log(purchaseLists[0].name)
   }
 
   render() {
