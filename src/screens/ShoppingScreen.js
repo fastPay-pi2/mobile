@@ -193,6 +193,7 @@ export default class ShoppingScreen extends React.Component {
     if (res) {
       await AsyncStorage.removeItem('purchaseId');
       await AsyncStorage.removeItem('cartRfid');
+      await AsyncStorage.removeItem('currentPurchaseLists');
       alert('Compra cancelada');
       clearInterval(this.timerPurchase);
       clearInterval(this.timerStatus);
