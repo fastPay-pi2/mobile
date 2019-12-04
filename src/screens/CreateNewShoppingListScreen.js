@@ -20,7 +20,9 @@ export default class CreateNewShoppingListScreen extends React.Component {
   state = {
     list: {},
     productCatalog: {},
-    listName: ''
+    productRecommendationCatalog: [],
+    listName: '',
+    isCompleteList: false
   };
 
   async componentDidMount() {
@@ -36,7 +38,11 @@ export default class CreateNewShoppingListScreen extends React.Component {
     productCatalog = await this.setUpSubCategory(productCatalog);
     productCatalog = await this.setUpProducts(productCatalog);
 
+    productRecommendationCatalog = await api.recommendation.get('/');
+
     this.setState({ productCatalog });
+    this.setState({ productRecommendationCatalog: productRecommendationCatalog.data });
+    // console.log(this.state.productCatalog)
   }
 
   onChange = value => {
@@ -252,14 +258,14 @@ export default class CreateNewShoppingListScreen extends React.Component {
 
   render() {
     const productCatalog = [];
-
+    
     for (var category of Object.values(this.state.productCatalog)) {
       productCatalog.push(
         <Text key={category.name} style={styles.categoryName}>
           {category.name}
         </Text>
       );
-
+      
       for (var subCategory of Object.values(category.subcategories)) {
         productCatalog.push(
           <View style={{ paddingLeft: 0 }}>
@@ -271,13 +277,62 @@ export default class CreateNewShoppingListScreen extends React.Component {
               ItemSeparatorComponent={() => <View style={{ width: 30 }} />}
               renderItem={({ item }) => this._renderItem(item)}
               data={subCategory.products}
-            />
+              />
           </View>
         );
       }
     }
 
-    return <ScrollView style={{ flex: 1 }}>{productCatalog}</ScrollView>;
+    var productsRecommendation = [];
+    var aux = [];
+    var count = 0;
+    
+    this.state.productRecommendationCatalog.map(product => {
+      // console.log(product)
+      if(count == 3) {
+        productsRecommendation.push(aux)
+        count = 0
+        aux = []
+      }
+      aux.push(product)
+      count++;
+    });
+    // console.log(productsRecommendation)
+
+    const productRecommendationCatalog = [];
+    
+    productsRecommendation.map(products => {
+      console.log(products)
+      productRecommendationCatalog.push(
+        <View style={{ paddingLeft: 0 }}>
+          <FlatList
+            style={{ paddingHorizontal: 5, paddingVertical: 5 }}
+            keyExtractor={item => item.id}
+            horizontal
+            ItemSeparatorComponent={() => <View style={{ width: 30 }} />}
+            renderItem={({ item }) => this._renderItem(item)}
+            data={products}
+            />
+        </View>
+      );
+    });
+    
+    return <View>
+      { this.state.isCompleteList ? (
+        <ScrollView style={{ flex: 1 }}>{productCatalog}</ScrollView>
+      ) : (
+        <View>
+          <ScrollView style={{ flex: 1 }}>{productRecommendationCatalog}</ScrollView>
+          <TouchableOpacity
+            onPress={() => {this.setState({ isCompleteList: true })}}
+            style={styles.buttonAdd}>
+            <Text style={styles.buttonAddText}>
+              Ver Mais
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>;
   }
 }
 
@@ -320,5 +375,20 @@ const styles = StyleSheet.create({
     flex: 0.5,
     alignItems: 'center'
   },
-  iconStyle: {}
+  iconStyle: {},
+  buttonAdd: {
+    paddingVertical: 18,
+    marginHorizontal: 66,
+    marginVertical: 20,
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#EDEFF2'
+  },
+  buttonAddText: {
+    color: '#FC1055',
+    fontWeight: 'bold',
+    fontSize: 16
+  },
 });
