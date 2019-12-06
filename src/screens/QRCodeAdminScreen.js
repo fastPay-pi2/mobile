@@ -16,7 +16,7 @@ import * as Permissions from 'expo-permissions';
 import api from '../config/api'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
-export default class QRCodeScannerScreen extends React.Component {
+export default class QRCodeAdminScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     scanned: false,
@@ -25,10 +25,7 @@ export default class QRCodeScannerScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Escaneie o código QR',
-      headerLeft: <HeaderBackButton onPress={async () => {
-        await AsyncStorage.removeItem('currentPurchaseLists');
-        navigation.navigate('App')
-      }} />,
+      headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
       headerStyle: {
         backgroundColor: '#fff',
         borderRadius: 10,
@@ -73,35 +70,22 @@ export default class QRCodeScannerScreen extends React.Component {
   handleQRCodeScanned = async ({ type, data }) => {
     const cartRfid = data;
     this.setState({ scanned: true });
-
-    const userToken = await AsyncStorage.getItem('userToken');
-    header = {
-      headers: {
-        'Authorization': 'Bearer ' + userToken,
-      }
-    }
-
     const userId = await AsyncStorage.getItem('userId');
     const body = {
       'user_id': userId,
       'cart_id': cartRfid,
     }
 
-    api.purchase.post('/api/purchase/', body, header)
+    api.purchase.get('/api/cart/', body)
     .then( async res => {
-      await AsyncStorage.setItem('purchaseId', res.data.id);
       await AsyncStorage.setItem('cartRfid', cartRfid);
-      var currentPurchaseLists = await AsyncStorage.getItem('currentPurchaseLists');
-      alert(`Compra cadastrada`);
-      if(currentPurchaseLists){
-        this.props.navigation.navigate('ShoppingWithList');
-      }
-      this.props.navigation.navigate('Shopping');
+      alert(`Iniciando verificação de produtos do carrinho`);
+      this.props.navigation.navigate('BarCodeScan');
     })
     .catch(error => {
       console.log(error.response);
-      if (error.response.data.error === 'There is a pending purchase') {
-        alert('Este carrinho já está associado à uma compra ')
+      if (error.response.data.error === 'CartModel matching query does not exist.') {
+        alert('Este carrinho não está cadastrado ')
       }
       alert(`Carrinho ${cartRfid} inválido`);
     })

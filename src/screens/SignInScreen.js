@@ -13,33 +13,35 @@ import {
   Image
 } from 'react-native';
 import api from '../config/api';
-import EmailField from '../components/EmailField'
-import PasswordField from '../components/PasswordField'
-import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator'
-
+import EmailField from '../components/EmailField';
+import PasswordField from '../components/PasswordField';
+import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 
 export default class SignInScreen extends React.Component {
   state = {
-      email: '',
-      password: '',
-      focus: false,
-      isLoading: false,
-      error: false,
-      messageError: '',
-    };
+    email: '',
+    password: '',
+    focus: false,
+    isLoading: false,
+    error: false,
+    messageError: ''
+  };
 
-    static navigationOptions = {
-      header: null,
+  static navigationOptions = {
+    header: null,
     headerBackTitle: null
   };
 
   render() {
     return (
-      <View style={{flex:1}}>
+      <View style={{ flex: 1 }}>
         <KeyboardAvoidingView style={styles.content} behavior="padding">
           <View style={styles.logoView}>
-            <Image source={require('../assets/images/carshier_Logo_transparente.png')} style={styles.imageLogo}/>
-            <Text style={styles.textLogo} >fastPay</Text>
+            <Image
+              source={require('../assets/images/carshier_Logo_transparente.png')}
+              style={styles.imageLogo}
+            />
+            <Text style={styles.textLogo}>fastPay</Text>
           </View>
           <EmailField
             callback={usernameInput => this.setState({ email: usernameInput })}
@@ -48,16 +50,20 @@ export default class SignInScreen extends React.Component {
             value={this.state.email}
             blurOnSubmit={false}
             size={26}
-            />
+          />
           <PasswordField
-            refs={(input) =>  this.secondTextInput = input}
-            callback={passwordInput => this.setState({ password: passwordInput })}
+            refs={input => (this.secondTextInput = input)}
+            callback={passwordInput =>
+              this.setState({ password: passwordInput })
+            }
             password={this.state.password}
             placeholder="password"
             isPassword
             focus={this.state.focus}
           />
-        <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
+          <Text style={styles.messageErrorStyle}>
+            {this.state.messageError}
+          </Text>
 
           <ButtonWithActivityIndicator
             activityIndicatorStyle={styles.loading}
@@ -76,22 +82,22 @@ export default class SignInScreen extends React.Component {
             activeOpacity={0.6}
             onPress={() => this.props.navigation.navigate('Register')}
           >
-            <Text>Ainda não se cadastrou?
+            <Text>
+              Ainda não se cadastrou?
               <Text style={{ color: '#0000FF' }}> Cadastrar-se</Text>
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-
     );
   }
 
   _signInAsync = async () => {
-    this.setState({ isLoading: true })
+    this.setState({ isLoading: true });
     const body = {
-      'email': this.state.email,
-      'password': this.state.password,
-    }
+      email: this.state.email,
+      password: this.state.password
+    };
 
     try {
       const resAuth = await api.auth.post('/sessions', body);
@@ -102,13 +108,23 @@ export default class SignInScreen extends React.Component {
         await AsyncStorage.setItem('userId', resAuth.data.user._id);
         await AsyncStorage.setItem('userCPF', resAuth.data.user.cpf);
         await AsyncStorage.setItem('userEmail', resAuth.data.user.email);
-        this.props.navigation.navigate('App');
+
+        //AsyncStorage permite apenas strings
+        await AsyncStorage.setItem(
+          'isAdmin',
+          JSON.stringify(resAuth.data.user.isAdmin)
+        );
+        if (resAuth.data.user.isAdmin) {
+          this.props.navigation.navigate('BarCodeScan');
+        } else {
+          this.props.navigation.navigate('App');
+        }
       }
     } catch (error) {
       if (error.response.data.error === 'User not found') {
-        this.setState({messageError: 'Usuário ou senha inválida'});
+        this.setState({ messageError: 'Usuário ou senha inválida' });
       } else if (error.response.data.error === 'Invalid password') {
-        this.setState({messageError: 'Senha inválida'});
+        this.setState({ messageError: 'Senha inválida' });
       }
       this.setState({ isLoading: false });
     }
@@ -120,11 +136,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     backgroundColor: '#fad3b0',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   loading: {
     marginTop: 50,
-    paddingVertical: 13,
+    paddingVertical: 13
   },
   buttonLogin: {
     paddingVertical: 18,
@@ -135,13 +151,13 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    shadowOffset : { width: 0, height: 13},
+    shadowOffset: { width: 0, height: 13 }
   },
   logoView: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingBottom: 20
   },
   imageLogo: {
     width: 120,
@@ -149,7 +165,7 @@ const styles = StyleSheet.create({
   },
   textLogo: {
     fontSize: 36,
-    fontFamily: 'work-sans-semiBold',
+    fontFamily: 'work-sans-semiBold'
   },
   footer: {
     flex: 0.075,
@@ -161,10 +177,10 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    shadowOffset : { width: 0, height: 10},
+    shadowOffset: { width: 0, height: 10 }
   },
   messageErrorStyle: {
     alignSelf: 'center',
-    color: '#FC1055',
-  },
+    color: '#FC1055'
+  }
 });
