@@ -165,7 +165,7 @@ export default class CreateNewShoppingListScreen extends React.Component {
     let products = {};
 
     try {
-      res = await api.products.get('/product');
+      res = await api.products.get('/beautiful_products');
       products = res.data;
     } catch (error) {
       console.log(error);
