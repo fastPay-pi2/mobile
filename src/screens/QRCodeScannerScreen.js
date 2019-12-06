@@ -25,7 +25,10 @@ export default class QRCodeScannerScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Escaneie o código QR',
-      headerLeft: <HeaderBackButton onPress={() => navigation.navigate('App')} />,
+      headerLeft: <HeaderBackButton onPress={async () => {
+        await AsyncStorage.removeItem('currentPurchaseLists');
+        navigation.navigate('App')
+      }} />,
       headerStyle: {
         backgroundColor: '#fff',
         borderRadius: 10,
@@ -88,7 +91,11 @@ export default class QRCodeScannerScreen extends React.Component {
     .then( async res => {
       await AsyncStorage.setItem('purchaseId', res.data.id);
       await AsyncStorage.setItem('cartRfid', cartRfid);
+      var currentPurchaseLists = await AsyncStorage.getItem('currentPurchaseLists');
       alert(`Compra cadastrada`);
+      if(currentPurchaseLists){
+        this.props.navigation.navigate('ShoppingWithList');
+      }
       this.props.navigation.navigate('Shopping');
     })
     .catch(error => {

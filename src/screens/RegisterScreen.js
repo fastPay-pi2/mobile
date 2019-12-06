@@ -13,16 +13,15 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   BackHandler,
-  Dimensions,
+  Dimensions
 } from 'react-native';
-import api from '../config/api'
-import CpfField from '../components/CpfField'
-import NameField from '../components/NameField'
-import UsernameField from '../components/UsernameField'
-import EmailField from '../components/EmailField'
-import PasswordField from '../components/PasswordField'
-import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator'
-
+import api from '../config/api';
+import CpfField from '../components/CpfField';
+import NameField from '../components/NameField';
+import PhoneNumberField from '../components/PhoneNumberField';
+import EmailField from '../components/EmailField';
+import PasswordField from '../components/PasswordField';
+import ButtonWithActivityIndicator from '../components/ButtonWithActivityIndicator';
 
 const { height } = Dimensions.get('window');
 const { width } = Dimensions.get('window');
@@ -30,38 +29,38 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   principal: {
     flex: 1,
-    backgroundColor: '#fad3b0',
+    backgroundColor: '#fad3b0'
   },
   content: {
     flex: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: 25,
     backgroundColor: '#fad3b0',
-    justifyContent: 'center',
+    justifyContent: 'space-around'
+    // marginVertical: 10
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 18
   },
   buttonRegister: {
-    width: (50/100)*width,
+    width: (50 / 100) * width,
     paddingVertical: 15,
-    marginTop: 20,
     borderRadius: 8,
     alignSelf: 'center',
     backgroundColor: '#FC1055',
     shadowColor: 'rgba(252, 16, 85, 0.5)',
     shadowOpacity: 0.8,
     shadowRadius: 15,
-    shadowOffset : { width: 0, height: 13},
+    shadowOffset: { width: 0, height: 13 }
   },
   loading: {
     marginTop: 20,
-    paddingVertical: 15,
+    paddingVertical: 15
   },
   messageErrorStyle: {
     alignSelf: 'center',
-    color: '#FC1055',
-  },
+    color: '#FC1055'
+  }
 });
 
 export default class RegisterScreen extends React.Component {
@@ -69,120 +68,144 @@ export default class RegisterScreen extends React.Component {
     username: '',
     email: '',
     name: '',
+    secondName: '',
     password: '',
     profile: {
       cpf: '',
-      phone: '',
+      phone: ''
     },
     passwordCompared: '',
     messageError: '',
-    isLoading: false,
+    isLoading: false
   };
 
   static navigationOptions = {
+    title: 'Cadastro',
     headerTruncatedBackTitle: null,
     headerTintColor: 'black',
-    headerStyle: {borderBottomWidth: 0}
+    headerStyle: {
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      height: 66
+    }
   };
 
   render() {
     return (
       <View style={styles.principal}>
-          <KeyboardAvoidingView style={styles.content} behavior="padding">
-            <View style={{ paddingHorizontal: 15 }}>
-              <Text>CPF</Text>
-              <CpfField
-                value={this.state.profile.cpf}
-                callback={validCpf =>
-                  this.setState({ profile: { ...this.state.profile, cpf: validCpf } })}
-              />
+        <KeyboardAvoidingView style={styles.content} behavior="padding">
+          <View>
+            <Text>CPF</Text>
+            <CpfField
+              value={this.state.profile.cpf}
+              callback={validCpf =>
+                this.setState({
+                  profile: { ...this.state.profile, cpf: validCpf }
+                })
+              }
+            />
 
-              <Text>Nome</Text>
-              <NameField
-                value={this.state.name}
-                callback={validName => this.setState({ name: validName })}
-              />
+            <Text>Nome</Text>
+            <NameField
+              value={this.state.name}
+              callback={validName => this.setState({ name: validName })}
+              placeholder="Digite seu nome"
+            />
 
-              <Text>Username</Text>
-              <UsernameField
-                callback={usernameInput => this.setState({ username: usernameInput })}
-                placeholder="Escolha um nome de usuário"
-                onSubmitEditing={() => this.setState({ focus: true })}
-                value={this.state.username}
-                blurOnSubmit={false}
-              />
+            <Text>Sobrenome</Text>
+            <NameField
+              value={this.state.secondName}
+              callback={validName => this.setState({ secondName: validName })}
+              placeholder="Digite seu sobrenome"
+            />
 
-              <Text>Email</Text>
-              <EmailField
-                value={this.state.email}
-                callback={validEmail => this.setState({ email: validEmail })}
-                placeholder="Digite o seu email"
-                size={26}
-              />
+            <Text>Email</Text>
+            <EmailField
+              value={this.state.email}
+              callback={validEmail => this.setState({ email: validEmail })}
+              placeholder="Digite o seu email"
+              size={26}
+            />
 
-              <Text>Senha</Text>
-              <PasswordField
-                callback={validPassword => this.setState({ password: validPassword })}
-                password={this.state.password}
-                placeholder="Digite sua senha"
-                isPassword
-                size={26}
-              />
+            <Text>Telefone</Text>
+            <PhoneNumberField
+              value={this.state.profile.phone}
+              callback={validNumber =>
+                this.setState({
+                  profile: { ...this.state.profile, phone: validNumber }
+                })
+              }
+            />
 
-              <Text>Confirmar Senha</Text>
-              <PasswordField
-                callback={validPassword => this.setState({ passwordCompared: validPassword })}
-                password={this.state.password}
-                passwordCompared={this.state.passwordCompared}
-                placeholder="Digite sua senha novamente"
-                isPassword={false}
-                size={26}
-              />
-              <Text style={styles.messageErrorStyle}>{this.state.messageError}</Text>
+            <Text>Senha</Text>
+            <PasswordField
+              callback={validPassword =>
+                this.setState({ password: validPassword })
+              }
+              password={this.state.password}
+              placeholder="Digite sua senha"
+              isPassword
+              size={26}
+            />
 
-              <ButtonWithActivityIndicator
-                activityIndicatorStyle={styles.loading}
-                onPress={() => this._registerAsync()}
-                isLoading={this.state.isLoading}
-                buttonKey="Cadastrar"
-                buttonText="Cadastrar"
-                buttonStyle={styles.buttonRegister}
-              />
-
-            </View>
-          </KeyboardAvoidingView>
+            <Text>Confirmar Senha</Text>
+            <PasswordField
+              callback={validPassword =>
+                this.setState({ passwordCompared: validPassword })
+              }
+              password={this.state.password}
+              passwordCompared={this.state.passwordCompared}
+              placeholder="Digite sua senha novamente"
+              isPassword={false}
+              size={26}
+            />
+            <Text style={styles.messageErrorStyle}>
+              {this.state.messageError}
+            </Text>
+          </View>
+          <ButtonWithActivityIndicator
+            activityIndicatorStyle={styles.loading}
+            onPress={() => this._registerAsync()}
+            isLoading={this.state.isLoading}
+            buttonKey="Cadastrar"
+            buttonText="Cadastrar"
+            buttonStyle={styles.buttonRegister}
+          />
+        </KeyboardAvoidingView>
       </View>
-    )
+    );
   }
 
   _registerAsync = async () => {
-    this.setState({isLoading: true});
+    this.setState({ isLoading: true });
     const body = {
-      'name': this.state.name,
-      'username': this.state.username,
-      'email': this.state.email,
-      'cpf': this.state.profile.cpf,
-      'password': this.state.password,
-      'birphday': '',
-      'idAdmin': false,
-    }
+      name: this.state.name,
+      secondName: this.state.secondName,
+      email: this.state.email,
+      phoneNumber: this.state.profile.phone,
+      cpf: this.state.profile.cpf,
+      password: this.state.password,
+      birphday: '',
+      idAdmin: false
+    };
 
-    api.auth.post('/users', body)
-    .then( res => {
-      console.log(res);
-      if (res.status === 200) {
-        this.setState({ isLoading: false });
-        this.props.navigation.navigate('SignIn');
-      }
-    })
-    .catch(error => {
-      console.log(error.response);
+    api.auth
+      .post('/users', body)
+      .then(res => {
+        console.log(res);
+        if (res.status === 200) {
+          this.setState({ isLoading: false });
+          this.props.navigation.navigate('SignIn');
+        }
+      })
+      .catch(error => {
+        console.log(error.response);
 
-      if (error.response.data.error === 'User already exists') {
-        this.setState({messageError: 'Usuário já existe'});
-        this.setState({ isLoading: false });
-      }
-    })
+        if (error.response.data.error === 'User already exists') {
+          this.setState({ messageError: 'Usuário já existe' });
+          this.setState({ isLoading: false });
+        }
+      });
     // await AsyncStorage.setItem('userToken', '');
   };
 }
