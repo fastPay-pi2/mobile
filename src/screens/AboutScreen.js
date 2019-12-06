@@ -30,7 +30,7 @@ export default class AboutScreen extends React.Component {
 
   static navigationOptions = ({navigation}) => {
     return {
-        title: 'About',
+        title: 'Sobre',
         headerLeft: <HeaderBackButton onPress={() => navigation.navigate('Config')} />,
         headerStyle: {
         backgroundColor: '#fff',
@@ -73,41 +73,14 @@ export default class AboutScreen extends React.Component {
     return (
       <View >
         <View style={styles.container}>
-          <Text style={styles.userNameStyle}>TEXTO DO SOBRE</Text>
+          <Text style={styles.userNameStyle}>FastPay é um sistema automatizado para pagamento em
+                                             supermercados desenvolvido por alunos da
+                                             Universidade de Brasília para a disciplina de
+                                             Projeto Integrador 2 do segundo semestre de 2019</Text>
         </View>
       </View>
     );
   }
-
-  _editAsync = async () => {
-    this.setState({isLoading: true});
-    const body = {
-      'username': this.state.userName,
-      'email': this.state.email,
-      'cpf': this.state.cpf,
-      'password': this.state.password,
-      'birthday': '',
-      'idAdmin': false,
-    }
-    const userId = await AsyncStorage.getItem('userId');
-
-    api.auth.put(`/users/${userId}`, body)
-    .then( res => {
-      console.log(res);
-      if (res.status === 200) {
-        this.setState({ isLoading: false });
-        this.props.navigation.navigate('SignIn');
-      }
-    })
-    .catch(error => {
-      console.log(error.response);
-      if (error.response.data.error === 'User already exists') {
-        this.setState({messageError: 'Usuário já existe'});
-        this.setState({ isLoading: false });
-      }
-    })
-    // await AsyncStorage.setItem('userToken', '');
-  };
 }
 
 
